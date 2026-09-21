@@ -506,6 +506,22 @@ body:not(.dev) #autoplay{display:none}
 .rbtns{grid-column:1/-1;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .rbtns button{min-width:150px}
 @media (max-height:520px) and (orientation:landscape), (max-width:520px) and (orientation:portrait){.rcard{gap:6px 16px}.rrow{padding:5px 8px}.rgain{padding:8px 10px}.rline{font-size:12px}}
+/* ---------- tutorial coach ---------- */
+.coach{z-index:96}
+.coach .spot{box-shadow:0 0 0 9999px rgba(12,1,3,.72),0 0 0 3px var(--brass)}
+.coach.act .spot{animation:cpulse 1.3s infinite}
+@keyframes cpulse{50%{box-shadow:0 0 0 9999px rgba(12,1,3,.72),0 0 0 3px var(--brass),0 0 26px 8px rgba(217,168,104,.75)}}
+.coach .tip{padding:10px 14px}
+.coach .tip b{font-size:15px;margin-bottom:4px}
+.coach .tip p{font-size:13px;margin:0 0 8px;line-height:1.4}
+.coach .tip .hint{font-size:11px;color:var(--brass);letter-spacing:.06em}
+.tutcard p{margin:0;font-size:15px;line-height:1.45}
+.tutgift{display:flex;align-items:center;gap:14px;justify-content:center;padding:12px;border-radius:12px;border:2px solid var(--brass);background:#3A1208;opacity:0;animation:gift .7s 1.8s forwards;text-align:left}
+.tutgift .ic{font-size:48px}
+.tutgift small{display:block;font-size:11px;letter-spacing:.14em;color:var(--brass)}
+.tutgift b{display:block;font-family:var(--display);font-weight:400;font-size:22px}
+.tutgift span{font-size:12px;color:var(--paper-dim)}
+@keyframes gift{0%{opacity:0;transform:scale(.6) rotate(-4deg)}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:none}}
 /* ---------- music ---------- */
 .musicbtn{position:absolute;right:calc(max(20px,var(--sr)) + 56px);top:max(12px,var(--st));z-index:2;width:34px;height:30px;padding:0;border-radius:6px;font-size:16px;background:rgba(0,0,0,.4)}
 .musicbtn.off{opacity:.45;text-decoration:line-through}
@@ -631,6 +647,7 @@ body:not(.dev) #autoplay{display:none}
 <div id="pview" class="pview" hidden></div>
 <div id="intro" class="intro" hidden></div>
 <div id="tour" class="tour" hidden></div>
+<div id="coach" class="tour coach" hidden></div>
 <div id="peek" class="peek" hidden></div>
 
 <!-- ===================== SIM ===================== -->
@@ -1270,22 +1287,23 @@ async function advance(r){
     if(hadEvents){
       await playEvents();
       await sleep(P().after);
+      await tutGate(req);
       if(lastActor&&lastActor.isBot&&document.getElementById('pausebot').checked&&!skipPause){ paused=r; busy=false; render(); return; }
     }
     skipPause=false;
     if(req.p.isBot){
       if(req.type==='attack'){ pending=req; render(); await sleep(P().think); }
-      lastActor=req.p; r=gen.next(botAnswer(G,req)); continue;
+      lastActor=req.p; r=gen.next(G.tut?tutBot(req):botAnswer(G,req)); continue;
     }
     if(req.type==='rearrange'){ meId=req.p.id; r=gen.next(null); continue; }
     pending=req; resetSel(); meId=req.p.id; hidePeek(true);
-    if(req.type==='attack'){ try{ if(!localStorage.getItem('koop.tourSeen')){ scheduleTour(); } }catch(e){} }
+    if(req.type==='attack'&&!G.tut){ try{ if(!localStorage.getItem('koop.tourSeen')){ scheduleTour(); } }catch(e){} }
     viewOpen = !needCurtain() || (req.p.id===lastHuman && sameTurnHuman);
     lastHuman=req.p.id; sameTurnHuman=true; busy=false; render(); return;
   }
   if(G.events.length){ await playEvents(); }
   pending=null; busy=false; render();
-  if(G.over&&!G.awarded){ G.awarded=true; const a=await awardGame(G); if(a){ G.award=a; render(); } setTimeout(()=>showResult(G),900); }
+  if(G.over&&!G.awarded){ G.awarded=true; const a=await awardGame(G); if(a){ G.award=a; render(); } setTimeout(()=>G.tut?showTutResult():showResult(G),900); }
 }
 function resumeFromPause(){ if(!paused) return; const r=paused; paused=null; lastActor=null; advance(r); }
 let lastHuman=null, sameTurnHuman=false, meId=0, drawerMode='log';
@@ -1540,9 +1558,9 @@ $('run').addEventListener('click',runSim);
 // ===================== ECONOMY & PROFILE =====================
 // Ваучеры растят кооператив (предприятия), копейки идут на вещи хозяина. На партию не влияет ничего.
 const ENT=[
-  {id:'palatka',name:'Палатка',ic:'⛺',cost:0,inc:5},
+  {id:'palatka',name:'Ларёк',ic:'🏪',cost:0,inc:5},
   {id:'lotok',name:'Лоток с пирожками',ic:'🥟',cost:3,inc:8},
-  {id:'larek',name:'Ларёк',ic:'🏪',cost:6,inc:12},
+  {id:'larek',name:'Павильон',ic:'🏬',cost:6,inc:12},
   {id:'kiosk',name:'Киоск «Союзпечать»',ic:'📰',cost:10,inc:16},
   {id:'rynok_tochka',name:'Точка на рынке',ic:'🧺',cost:15,inc:22},
   {id:'podval',name:'Видеопрокат в подвале',ic:'📼',cost:22,inc:30},
@@ -1579,7 +1597,7 @@ function fmt(n){ return Number(n).toLocaleString('ru-RU'); }
 function loadMe(){ try{ return JSON.parse(localStorage.getItem('koop.me')||'null'); }catch(e){ return null; } }
 function saveMe(){ try{ localStorage.setItem('koop.me',JSON.stringify(ME)); }catch(e){} }
 let ME=loadMe();
-function newMe(nick,coop){ return {nick,coop,v:3,k:100,ent:['palatka'],items:[],games:0,wins:0,pierces:0,follows:[],created:Date.now()}; }
+function newMe(nick,coop){ return {nick,coop,v:0,k:0,ent:[],tut:false,items:[],games:0,wins:0,pierces:0,follows:[],created:Date.now()}; }
 function topEnt(p){ let t=ENT[0]; for(const e of ENT) if(p.ent&&p.ent.includes(e.id)) t=e; return t; }
 function incomeOf(p){ return ENT.filter(e=>p.ent.includes(e.id)).reduce((a,e)=>a+e.inc,0); }
 function nextEnt(p){ return ENT.find(e=>!p.ent.includes(e.id)); }
@@ -1657,7 +1675,8 @@ function showReg(){
     if(nick.length<2){ $('regerr').textContent='Имя от двух букв.'; return; }
     if(coop.length<2){ $('regerr').textContent='Придумай название кооператива.'; return; }
     ME=newMe(nick,coop); saveMe(); r.hidden=true; updateMeChip(); buildSeats();
-    try{ if(!localStorage.getItem('koop.introSeen')) showIntro(); }catch(e){} };
+    try{ localStorage.setItem('koop.introSeen','1'); localStorage.setItem('koop.tourSeen','1'); }catch(e){}
+    tutIntro(); };
 }
 
 // ---------- chip on the cover ----------
@@ -1708,8 +1727,169 @@ function openPerson(p){
 }
 $('empirebtn').onclick=()=>goPage('empire'); $('shopbtn').onclick=()=>goPage('shop');
 
+// ===================== FORCED TUTORIAL MATCH =====================
+const TUT_OPP='Михалыч';
+function tutCard(type,img){ const a=ATTACKS.find(x=>x[2]===img); return {type,name:a[1],img}; }
+function tutIdx(p,sid){ return p.table.findIndex(s=>s&&(sid==='dummy'?s.kind==='dummy':s.sid===sid)); }
+function tutHand(type,nth){ const me=G.players[0]; let k=0; for(let i=0;i<me.atk.length;i++){ if(me.atk[i].type===type){ if(k===(nth||0)) return i; k++; } } return -1; }
+function tutIntro(){
+  const r=$('reg'); r.hidden=false;
+  r.innerHTML=`<div class="regcard tutcard"><span class="stamp">1993</span><h2>Первая разборка</h2>
+    <p>Кооператив «${esc(ME.coop)}» зарегистрирован, но точки у тебя пока нет. Место на рынке надо отстоять.</p>
+    <p>Сыграй одну партию с ${TUT_OPP}ым. Я буду подсказывать каждый ход. Выиграешь — получишь ваучеры, копейки и свой первый ларёк.</p>
+    <button class="primary big" id="tutgo">К столу</button></div>`;
+  $('tutgo').onclick=()=>{ r.hidden=true; const pp=personaFor(TUT_OPP); if(pp.coop===ME.coop) pp.coop=COOPS.find(x=>x!==ME.coop);
+    showLoading([{name:ME.nick,coop:ME.coop,isBot:false},{name:TUT_OPP,coop:pp.coop,isBot:true,persona:pp}],false,startTutorial); };
+}
+function startTutorial(seats){
+  const opts=getOpts(); opts.variant='v2'; opts.v2limit=9; opts.v2dummy='miss'; opts.v2hand=4; opts.v2draw='one';
+  G=newGame(seats.map(x=>({name:x.name,isBot:x.isBot})),opts,100000,true); G.tut=true; G.tutGates={};
+  seats.forEach((x,i)=>{ G.players[i].coop=x.coop||null; G.players[i].persona=x.persona||null; });
+  const me=G.players[0], op=G.players[1]; op.dumb=true;
+  me.table=['license','ment','dummy','krysha','nephew'].map(s=>s==='dummy'?{kind:'dummy'}:{kind:'shield',sid:s});
+  op.table=['krysha','market','dummy','bratki','nephew'].map(s=>s==='dummy'?{kind:'dummy'}:{kind:'shield',sid:s});
+  me.atk=[tutCard('phone','phone-raya'),tutCard('fist','fist-serega'),tutCard('mask','mask-tamara')];
+  op.atk=[tutCard('fist','fist-gastrol'),tutCard('mask','mask-lyuba'),tutCard('money','money-boris')];
+  // draws, popped from the end: me T1, op T1, me T2, op T2, me T3
+  G.deck.push(tutCard('cap','cap-oper'),tutCard('cap','cap-gorbunov'),tutCard('lens','lens-tax'),tutCard('money','money-manager'),tutCard('fist','fist-patsany'));
+  gen=startGame(G,0); meId=0; lastHuman=null; sameTurnHuman=false; viewOpen=false;
+  $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
+  say(G,'o-sys','Обучающая партия. Первым ходишь ты.');
+  step(undefined); coachStart();
+}
+// scripted opponent
+function tutBot(req){
+  const me=G.players[0], op=G.players[1];
+  if(req.type==='attack'){
+    const i=op.attacksMade;
+    if(i===0){ const c=op.atk.findIndex(x=>x.type==='money'); return {targetId:0,slot:tutIdx(me,'dummy'),cardIdxs:[c<0?0:c]}; }
+    const c=op.atk.findIndex(x=>x.type==='mask'); return {targetId:0,slot:tutIdx(me,'license'),cardIdxs:[c<0?0:c]};
+  }
+  if(req.type==='give'||req.type==='over'){ const i=op.table.findIndex(s=>s&&s.kind==='shield'&&s.sid!=='market'); return {from:'table',idx:i>=0?i:op.table.findIndex(s=>s&&s.kind==='shield')}; }
+  return botAnswer(G,req);
+}
+// info shown between moves; key = "turn:who:type" of the next request
+const TUT_GATES={
+  '2:1:attack':()=>({sel:'#mine .window',h:'Пробил!',p:'«Крыша» была уязвима к Связям. Щит соперника теперь твой: он лёг последним в твой ряд и под замком 🔒 до твоего хода, отбить его сразу нельзя.'}),
+  '3:0:attack':()=>({sel:`#mine .slotpos[data-i="${tutIdx(G.players[0],'dummy')}"]`,h:'«Ушёл на базу»',p:'Соперник ударил в твою пустышку. Промах: никто ничего не теряет. Но теперь все знают, где она лежит, это видно по значку 👁.'}),
+  '4:1:attack':()=>({sel:'#opps .kiosk',h:'Ставка ×2',p:'Две карты одного вида бьют как одна, но на кону сразу два щита. Попал — забрал два. Отразил бы — отдал бы два своих.'}),
+  '5:0:attack':()=>({sel:`#mine .slotpos[data-i="${tutIdx(G.players[0],'license')}"]`,h:'Щит держит',p:'Обаяние не пробивает «Легальную лицензию» и не отражается ею. Такой удар просто держится: ничего не происходит. А если бы щит отражал атаку, щит отдал бы сам нападающий.'})
+};
+async function tutGate(req){
+  if(!G||!G.tut) return; const key=`${G.turn}:${req.p.id}:${req.type}`; const g=TUT_GATES[key];
+  if(!g||G.tutGates[key]) return; G.tutGates[key]=1; render(true);
+  await new Promise(res=>{ coach.info={...g(),done:res}; coachDraw(); });
+}
+// forced steps on your own turns
+function myTurn(t){ return G&&G.tut&&!G.over&&pending&&pending.p.id===0&&pending.type==='attack'&&!busy&&G.turn===t; }
+const aimOpen=()=>!!document.querySelector('.aim');
+const TUT_STEPS=[
+  {t:1,info:1,sel:'#mine .window',h:'Твоя точка',p:'Это твой ряд: четыре щита и пустышка «Ушёл на базу». Щиты — это твоя защита. Потеряешь все — разорён.'},
+  {t:1,sel:()=>`#mine .slotpos[data-i="${tutIdx(G.players[0],'license')}"]`,h:'Что в щите',p:'Свои щиты видишь только ты. Нажми на «Легальную лицензию», посмотрим, от чего она защищает.',done:()=>!$('peek').hidden},
+  {t:1,info:1,sel:'#peek .pk-plate',side:1,h:'Плашка щита',p:'Красные значки — атаки, которые пробивают щит: здесь Проверка и Связи. Золотой — атака, которую щит отражает обратно в нападающего: здесь Деньги. Остальное щит просто держит.',after:()=>hidePeek()},
+  {t:1,info:1,sel:'#opps .kiosk',h:'Соперник',p:'Щиты соперника закрыты. Что где лежит, ты не знаешь, пока не ударишь.'},
+  {t:1,sel:()=>`#me [data-c="${tutHand('phone')}"]`,h:'Выбери карту',p:'Это твои карты атак. Нажми на «Тётю Раю», это Связи.',done:()=>sel.cards.length>0},
+  {t:1,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Кого бьём',p:'Теперь нажми на соперника.',done:aimOpen},
+  {t:1,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'krysha')}"]`,h:'Куда бьём',p:'Мне шепнули: первая карта у него — «Крыша из города». Крышу пробивают Связи. Выбери её.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
+  {t:1,sel:'#aimfire',h:'Бей!',p:'Жми «Бить».',done:()=>G.players[0].attacksMade>=1},
+  {t:3,sel:()=>`#me [data-c="${tutHand('fist',0)}"]`,h:'Ставка',p:'У тебя две карты Братвы. Выбери первую…',done:()=>sel.cards.length>=1},
+  {t:3,sel:()=>`#me [data-c="${tutHand('fist',1)}"]`,h:'Ставка',p:'…и вторую. Можно ставить до трёх карт одного вида.',done:()=>sel.cards.length>=2},
+  {t:3,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Кого бьём',p:'Нажми на соперника.',done:aimOpen},
+  {t:3,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'bratki')}"]`,h:'Куда бьём',p:'Здесь «Братки с района». Их пробивает Братва. Выбери эту карту.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
+  {t:3,sel:'#aimfire',h:'Бей!',p:'На кону два щита. Жми «Бить».',done:()=>G.players[0].attacksMade>=2},
+  {t:5,sel:()=>`#me [data-c="${tutHand('lens')}"]`,h:'Добей его',p:'У соперника остались щит и пустышка. Щит — «Администрация рынка», её пробивает Проверка. Выбери «Налоговую».',done:()=>sel.cards.length>0},
+  {t:5,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Кого бьём',p:'Нажми на соперника.',done:aimOpen},
+  {t:5,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'market')}"]`,h:'Куда бьём',p:'Вот она. Выбирай.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
+  {t:5,sel:'#aimfire',h:'Последний удар',p:'Жми «Бить».',done:()=>G.players[0].attacksMade>=3}
+];
+const coach={on:false,i:0,info:null,iv:null,allow:null};
+function placeTip(tip,r,side){
+  const W=VW(), H=VH(), w=tip.offsetWidth, h=tip.offsetHeight, g=12, m=8;
+  const cx=Math.min(W-w-m,Math.max(m,r.left+r.width/2-w/2)), cy=Math.min(H-h-m,Math.max(m,r.top+r.height/2-h/2));
+  let c=[[cx,r.bottom+g],[cx,r.top-h-g],[r.right+g,cy],[r.left-w-g,cy]]; if(side) c=[c[2],c[3],c[0],c[1]];
+  const ok=([x,y])=>x>=m&&y>=m&&x+w<=W-m&&y+h<=H-m&&!(x<r.right&&x+w>r.left&&y<r.bottom&&y+h>r.top);
+  const best=c.find(ok)||c.map(([x,y])=>[Math.min(W-w-m,Math.max(m,x)),Math.min(H-h-m,Math.max(m,y))]).find(ok)||[m,m];
+  tip.style.left=best[0]+'px'; tip.style.top=best[1]+'px';
+}
+function coachStart(){ coach.on=true; coach.i=0; coach.info=null; clearInterval(coach.iv); coach.iv=setInterval(coachTick,200); }
+function coachStop(){ coach.on=false; coach.info=null; coach.allow=null; clearInterval(coach.iv); $('coach').hidden=true; }
+function coachTick(){
+  if(!coach.on) return;
+  if(coach.info){ coachDraw(); return; }
+  let st=TUT_STEPS[coach.i];
+  while(st&&!st.info&&st.done&&st.done()){ coach.i++; st=TUT_STEPS[coach.i]; }
+  if(st&&myTurn(st.t)){ const selr=typeof st.sel==='function'?st.sel():st.sel; const needAim=selr.includes('.aim')||selr==='#aimfire'; if(needAim===aimOpen()){ coachDraw(st); return; } }
+  coach.allow=null; $('coach').hidden=true;
+}
+function coachDraw(st){
+  const s=coach.info||st; if(!s){ $('coach').hidden=true; return; }
+  const selr=typeof s.sel==='function'?s.sel():s.sel; const el=document.querySelector(selr);
+  if(!el){ $('coach').hidden=true; return; }
+  const info=!!(coach.info||s.info); coach.allow=info?null:(s.allow||selr);
+  const r=L(el.getBoundingClientRect()); const pad=6;
+  const tipW=Math.min(300,VW()-24);
+  let left=r.left+r.width/2-tipW/2; left=Math.min(VW()-tipW-10,Math.max(10,left));
+  let top=r.bottom+12; const tipH=info?150:110; if(top+tipH>VH()-6) top=Math.max(8,r.top-tipH-12);
+  if(top<8||(top<r.bottom&&top+tipH>r.top)){ top=Math.max(8,Math.min(VH()-tipH-8,r.top)); left=r.right+14+tipW<VW()?r.right+14:Math.max(10,r.left-tipW-14); }
+  const c=$('coach'); c.hidden=false; c.classList.toggle('act',!info);
+  const key=selr+'|'+s.h+'|'+Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width);
+  if(c.dataset.key===key) return; c.dataset.key=key;
+  c.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>
+    <div class="tip" style="left:${left}px;top:${top}px;width:${tipW}px"><b>${s.h}</b><p>${s.p}</p>${info?'<div class="row" style="justify-content:flex-end"><button class="primary" id="coachnext">Понятно</button></div>':'<div class="hint">👆 нажми на подсвеченное</div>'}</div>`;
+  placeTip(c.querySelector('.tip'),r,s.side);
+  const nb=$('coachnext'); if(nb) nb.onclick=()=>{ c.dataset.key=''; if(coach.info){ const d=coach.info.done; coach.info=null; $('coach').hidden=true; d&&d(); } else { s.after&&s.after(); coach.i++; coachTick(); } };
+}
+// while the tutorial runs, only the highlighted thing is clickable
+document.addEventListener('click',e=>{
+  const tutRun=G&&G.tut&&!G.over&&coach.on; const post=postTut.on;
+  if(!tutRun&&!post) return;
+  const t=e.target;
+  if(t.closest('#coach .tip')||t.closest('#musicbtn')) return;
+  const allow=post?postTut.allow:coach.allow;
+  if(allow&&t.closest(allow)) return;
+  e.stopPropagation(); e.preventDefault();
+},true);
+// ---------- after the win: reward, then walk to the Empire ----------
+function showTutResult(){
+  coachStop();
+  const R={v:3,k:50};
+  ME.v+=R.v; ME.k+=R.k; if(!ME.ent.includes('palatka')) ME.ent.unshift('palatka'); ME.games++; ME.wins++; ME.pierces+=(G.players[0].pierces||0); ME.tut='reward'; saveMe(); updateMeChip();
+  const e0=ENT[0]; const el=$('result');
+  el.innerHTML=`<div class="rcard" style="grid-template-columns:1fr;max-width:520px;text-align:center">
+    <div class="rhead"><h2>Поздравляем!</h2><p>Первая разборка выиграна. ${TUT_OPP} уехал ни с чем.</p></div>
+    <div class="rgain"><h3>ТВОЯ ДОЛЯ</h3>
+      <div class="rtot"><div><b data-count="${R.v}">0</b><small>🎟 ваучера</small></div><div><b data-count="${R.k}">0</b><small>🪙 копеек</small></div></div></div>
+    <div class="tutgift"><span class="ic">${e0.ic}</span><div><small>ТВОЙ ПЕРВЫЙ БИЗНЕС</small><b>${e0.name}</b><span>+${e0.inc} копеек после каждой партии</span></div></div>
+    <div class="rbtns"><button class="primary" id="tutclaim">Забрать</button></div></div>`;
+  el.hidden=false; void el.offsetWidth; el.classList.add('on');
+  setTimeout(()=>el.querySelectorAll('[data-count]').forEach(b=>{ const to=+b.dataset.count, t0=Date.now(); const iv=setInterval(()=>{ const k=Math.min(1,(Date.now()-t0)/800); b.textContent=fmt(Math.round(to*k)); if(k>=1) clearInterval(iv); },30); }),900);
+  $('tutclaim').onclick=()=>{ el.hidden=true; el.classList.remove('on'); $('newgame').click(); postTutStart(); };
+}
+const postTut={on:false,allow:null,step:0,iv:null};
+const POST_STEPS=[
+  {sel:'#empirebtn',h:'Твоя империя',p:'Ларёк уже твой. Загляни в «Империю»: там все предприятия, которые можно открыть.',done:()=>$('page-empire').classList.contains('on')},
+  {sel:'#entlist [data-buy="lotok"]',h:'Второе предприятие',p:'Трёх ваучеров хватает на «Лоток с пирожками». Покупай, он добавит доход.',done:()=>ME.ent.includes('lotok')},
+  {sel:'#page-empire .backbar button',h:'Как расти дальше',p:'Ваучеры дают за каждую партию и больше за победу. Копейки идут с предприятий, их тратят в «Лавке». Возвращайся к столу.',done:()=>!$('page-empire').classList.contains('on')},
+  {sel:'#findbtn',h:'Теперь по-настоящему',p:'Жми «Найти игру». Дальше без подсказок. Удачи, председатель!',done:()=>!$('lobby').hidden}
+];
+function postTutStart(){ postTut.on=true; postTut.step=0; clearInterval(postTut.iv); postTut.iv=setInterval(postTutTick,200); postTutTick(); }
+function postTutTick(){
+  let st=POST_STEPS[postTut.step];
+  while(st&&st.done()){ postTut.step++; st=POST_STEPS[postTut.step]; }
+  if(!st){ postTut.on=false; postTut.allow=null; clearInterval(postTut.iv); $('coach').hidden=true; ME.tut=true; saveMe(); return; }
+  const el=document.querySelector(st.sel); if(!el){ $('coach').hidden=true; postTut.allow=null; return; }
+  postTut.allow=st.sel;
+  const r=L(el.getBoundingClientRect()); const pad=6, tipW=Math.min(300,VW()-24);
+  let left=Math.min(VW()-tipW-10,Math.max(10,r.left+r.width/2-tipW/2)); let top=r.bottom+12; if(top+120>VH()) top=Math.max(8,r.top-132);
+  const c=$('coach'); c.hidden=false; c.classList.add('act');
+  const key=st.sel+Math.round(r.left)+','+Math.round(r.top); if(c.dataset.key===key) return; c.dataset.key=key;
+  c.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div><div class="tip" style="left:${left}px;top:${top}px;width:${tipW}px"><b>${st.h}</b><p>${st.p}</p><div class="hint">👆 нажми на подсвеченное</div></div>`;
+  placeTip(c.querySelector('.tip'),r);
+}
+function tutResume(){ if(!ME||ME.tut===undefined||ME.tut===true) return false; if(ME.tut==='reward'){ postTutStart(); return true; } tutIntro(); return true; }
+
 // ---------- loading between lobby and deal ----------
-function showLoading(seats,quick){
+function showLoading(seats,quick,starter){
   const el=$('loading'); el.hidden=false;
   el.innerHTML=`<div class="ltitle">Стол собран</div>
     <div class="licons">${TYPE_IDS.map((t,i)=>`<span style="--tc:${TCOLOR[t]};animation-delay:${(i*0.3).toFixed(2)}s"><img src="${IMG.icon(t)}" alt=""></span>`).join('')}</div>
@@ -1717,7 +1897,7 @@ function showLoading(seats,quick){
     <div class="lsub">РАЗДАЁМ КАРТЫ…</div>`;
   void el.offsetWidth; el.classList.add('on');
   if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.06,900);
-  setTimeout(()=>{ startMatch(seats,quick); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.2,2500); },380); },3200);
+  setTimeout(()=>{ (starter||startMatch)(seats,quick); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.2,2500); },380); },3200);
 }
 // ---------- end of match ----------
 function playAgain(){ const q=G&&G.quick; $('result').hidden=true; $('result').classList.remove('on'); $('newgame').click(); if(q) openLobby(); }
@@ -1765,7 +1945,7 @@ function renderIntro(){ const sl=SLIDES[slideI]; const last=slideI===SLIDES.leng
   $('iprev').onclick=()=>{slideI--;renderIntro();}; $('inext').onclick=()=>{ if(last) closeIntro(); else {slideI++;renderIntro();} }; $('iskip').onclick=closeIntro; }
 function closeIntro(){ $('intro').hidden=true; try{localStorage.setItem('koop.introSeen','1');}catch(e){} }
 $('howto').onclick=showIntro; $('rulesbtn').onclick=()=>goPage('rules'); $('profbtn').onclick=()=>goPage('profile');
-if(!ME) showReg(); else { try{ if(!localStorage.getItem('koop.introSeen')) showIntro(); }catch(e){} }
+if(!ME) showReg(); else if(!tutResume()) { try{ if(!localStorage.getItem('koop.introSeen')) showIntro(); }catch(e){} }
 
 // ===================== MUSIC =====================
 const bgm=$('bgm'); bgm.volume=0;
@@ -1821,7 +2001,7 @@ let tDeadline=0, tTick=null, pendingTimed=null;
 try{ const tl=localStorage.getItem('koop.tlimit'); if(tl!==null) $('tlimit').value=tl; }catch(e){}
 $('tlimit').addEventListener('change',e=>{ try{localStorage.setItem('koop.tlimit',e.target.value);}catch(x){} });
 function tLimit(){ return +$('tlimit').value||0; }
-function timerShouldRun(){ return G&&!G.over&&pending&&!pending.p.isBot&&viewOpen&&!busy&&!paused&&$('curtain').hidden&&$('intro').hidden&&$('pview').hidden&&$('loading').hidden&&!tourOn&&!tourQueued&&tLimit()>0; }
+function timerShouldRun(){ return G&&!G.tut&&!G.over&&pending&&!pending.p.isBot&&viewOpen&&!busy&&!paused&&$('curtain').hidden&&$('intro').hidden&&$('pview').hidden&&$('loading').hidden&&!tourOn&&!tourQueued&&tLimit()>0; }
 function startTimer(){ stopTimer(); if(!timerShouldRun()) return; tDeadline=Date.now()+tLimit()*1000; tTick=setInterval(tickTimer,250); tickTimer(); }
 function stopTimer(){ if(tTick){ clearInterval(tTick); tTick=null; } tDeadline=0; }
 function tickTimer(){
