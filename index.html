@@ -507,6 +507,22 @@ body:not(.dev) #autoplay{display:none}
 .rbtns{grid-column:1/-1;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .rbtns button{min-width:150px}
 @media (max-height:520px) and (orientation:landscape), (max-width:520px) and (orientation:portrait){.rcard{gap:6px 16px}.rrow{padding:5px 8px}.rgain{padding:8px 10px}.rline{font-size:12px}}
+/* ---------- mobile table: no side column, hand centred, quiet turn cues ---------- */
+@media (max-height:520px) and (orientation:landscape), (max-width:520px) and (orientation:portrait){
+  .hand-area{grid-template-columns:minmax(0,1fr);grid-template-areas:"me" "me"}
+  .prompt.quiet{display:none}
+  .prompt:not(.quiet){display:flex;flex-direction:column;gap:6px;position:absolute;right:0;bottom:6px;z-index:30;width:auto;max-width:min(260px,48%);padding:10px 12px;border-radius:10px;background:rgba(26,3,5,.94);border:1px solid var(--brass);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  .prompt:not(.quiet) .msg{width:auto;max-height:none;padding:0;text-align:left}
+  .prompt:not(.quiet) .t{font-size:13px}.prompt:not(.quiet) .s{font-size:12px}
+  .prompt:not(.quiet)>.row{width:auto;flex-direction:row;justify-content:flex-end;flex-wrap:wrap}
+  .prompt:not(.quiet) .tnum{display:none}
+  .hcard{--hw:min(calc(calc(var(--vh) * 42) * .6625), calc((var(--aw) * .56 - 40px) / 2.5))}
+  #me{justify-content:center}
+}
+.table:not(.myturn) #me .hcard{filter:brightness(.62) saturate(.75);transition:filter .4s}
+.table.myturn #me .hcard{transition:filter .4s}
+.kiosk.cur{animation:curglow 1.8s ease-in-out infinite}
+@keyframes curglow{0%,100%{box-shadow:0 0 0 2px var(--brass),0 0 18px rgba(217,168,104,.25),0 14px 30px rgba(0,0,0,.55)}50%{box-shadow:0 0 0 2px var(--brass),0 0 44px rgba(217,168,104,.6),0 14px 30px rgba(0,0,0,.55)}}
 /* ---------- tutorial pulse on the real targets ---------- */
 .cpulse{animation:cpulse2 1.05s ease-in-out infinite}
 .hcard.cpulse{z-index:40 !important}
@@ -525,10 +541,37 @@ body:not(.dev) #autoplay{display:none}
 .tb-clock i{position:absolute;left:50%;top:50%;width:4px;height:40%;margin-left:-2px;background:var(--brass);border-radius:2px;transform-origin:50% 0;animation:tbspin 1s linear infinite}
 .tb-clock::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:28%;margin-left:-2px;background:#FFE2A8;border-radius:2px;transform-origin:50% 0;transform:rotate(200deg)}
 @keyframes tbspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.tclock{position:fixed;left:50%;top:calc(var(--st) + 4px);transform:translateX(-50%);z-index:56;display:flex;align-items:center;gap:6px;padding:3px 12px 3px 8px;border-radius:999px;background:rgba(26,3,5,.85);border:1px solid var(--brass);font-family:var(--display);font-size:16px;color:var(--brass);font-variant-numeric:tabular-nums;pointer-events:none}
+.tclock{position:absolute;left:50%;top:2px;transform:translateX(-50%);z-index:31;display:flex;align-items:center;gap:6px;padding:3px 12px 3px 8px;border-radius:999px;background:rgba(26,3,5,.85);border:1px solid var(--brass);font-family:var(--display);font-size:16px;color:var(--brass);font-variant-numeric:tabular-nums;pointer-events:none}
 .tclock i{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;position:relative}
 .tclock i::after{content:"";position:absolute;left:4px;top:1px;width:2px;height:5px;background:currentColor}
 .tclock.hot{color:#FF6B5A;border-color:#FF6B5A;animation:pulse 1s infinite}
+/* ---------- new enterprise event ---------- */
+.entcele{position:fixed;inset:0;z-index:135;display:flex;align-items:center;justify-content:center;padding:max(10px,var(--st)) max(16px,var(--sr)) max(10px,var(--sb)) max(16px,var(--sl));background:rgba(6,0,1,0);transition:background .6s}
+.entcele.on{background:radial-gradient(ellipse at 35% 50%,rgba(70,14,10,.96),rgba(6,0,1,.98) 70%)}
+.ecwrap{display:flex;align-items:center;gap:clamp(18px,4vw,44px);max-width:900px;width:100%;max-height:100%}
+.ecphoto{position:relative;flex:none;width:min(46%,calc(var(--vh) * 72),380px);aspect-ratio:1;opacity:0;transform:translateY(-40px) rotate(-14deg) scale(.8);transition:opacity .5s .25s,transform .8s .25s cubic-bezier(.2,.9,.25,1.15)}
+.entcele.on .ecphoto{opacity:1;transform:rotate(-4deg)}
+.ecframe{width:100%;height:100%;filter:drop-shadow(0 22px 40px rgba(0,0,0,.8))}
+.ecframe img{width:100%;height:100%;object-fit:contain;display:block}
+.ecemoji{display:flex;width:100%;height:100%;align-items:center;justify-content:center;font-size:calc(var(--vh) * 30);background:#EFE8DA;border-radius:4px;box-shadow:inset 0 0 0 clamp(10px,4%,18px) #F6F1E6,inset 0 -60px 0 #F6F1E6}
+.ecstamp{position:absolute;right:-4%;bottom:14%;padding:4px 14px;border:4px solid #C0211A;color:#C0211A;font-family:var(--display);font-size:clamp(18px,6vh,34px);letter-spacing:.08em;border-radius:6px;background:rgba(239,227,200,.18);box-shadow:inset 0 0 0 2px rgba(192,33,26,.35);text-shadow:0 0 1px rgba(192,33,26,.6);transform:rotate(-16deg) scale(2.4);opacity:0;transition:transform .28s 1.05s cubic-bezier(.3,1.6,.5,1),opacity .15s 1.05s}
+.entcele.on .ecstamp{transform:rotate(-16deg) scale(1);opacity:.92}
+.ecinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:clamp(6px,2vh,14px);opacity:0;transform:translateX(24px);transition:opacity .5s .6s,transform .5s .6s}
+.entcele.on .ecinfo{opacity:1;transform:none}
+.eckick{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+.ecinfo h2{margin:0;font-size:clamp(24px,8vh,46px);line-height:1;color:#FFF}
+.ecstats{display:flex;gap:clamp(14px,4vw,34px)}
+.ecstats b{display:block;font-family:var(--display);font-size:clamp(22px,7vh,38px);color:var(--brass);line-height:1}
+.ecstats span{font-size:12px;color:var(--paper-dim)}
+.ecnext{padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(217,168,104,.3);display:flex;flex-direction:column;gap:6px}
+.ecnrow{display:flex;justify-content:space-between;gap:10px;font-size:13px;flex-wrap:wrap}
+.ecnrow b{font-family:var(--display);font-weight:400}
+.ecnext small{font-size:11px;color:var(--paper-dim)}
+.ecbar{height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.ecbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8A5A22,var(--brass));transition:width 1s 1.4s ease-out}
+.entcele.on .ecbar i{width:var(--p)}
+.ecinfo .big{align-self:flex-start;width:auto;min-width:170px;padding-left:28px;padding-right:28px}
+@media (max-height:520px) and (orientation:landscape), (max-width:520px) and (orientation:portrait){.ecinfo{gap:6px}.ecnext{padding:7px 10px}.ecinfo .big{padding:8px 18px;font-size:14px}}
 /* ---------- currency icons ---------- */
 .cic{display:inline-block;height:1.3em;width:auto;vertical-align:-.32em;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .cic.v{height:1.25em;vertical-align:-.3em}
@@ -1377,12 +1420,11 @@ async function advance(r){
     }
     skipPause=false;
     if(req.p.isBot){
-      if(req.type==='attack'){ pending=req; render(); turnBanner(req.p); await sleep(Math.max(1100,P().think)); turnBanner(null); }
+      if(req.type==='attack'){ pending=req; render(); await sleep(P().think); }
       lastActor=req.p; r=gen.next(G.tut?tutBot(req):botAnswer(G,req)); continue;
     }
     if(req.type==='rearrange'){ meId=req.p.id; r=gen.next(null); continue; }
     pending=req; resetSel(); meId=req.p.id; hidePeek(true);
-    if(req.type==='attack'&&!G.tut&&humansCount()===1) turnBanner(req.p,true);
     if(req.type==='attack'&&!G.tut){ try{ if(!localStorage.getItem('koop.tourSeen')){ scheduleTour(); } }catch(e){} }
     viewOpen = !needCurtain() || (req.p.id===lastHuman && sameTurnHuman);
     lastHuman=req.p.id; sameTurnHuman=true; busy=false; render(); return;
@@ -1572,7 +1614,9 @@ function render(quiet){
     case 'over': t='Лишний щит'; sub=`Больше ${G.opts.variant==='v2'?G.opts.v2limit:G.opts.limit} держать нельзя. Кликни щит, который уйдёт в сброс.`; break;
   }
   const showT = timerShouldRun();
-  pr.className='prompt'+(calm?' calm':''); pr.innerHTML=`<span class="msg"><span class="t">${t}</span><span class="s">${sub}</span></span><span class="row">${btns}${showT?'<span class="tnum"></span>':''}</span>`;
+  const pquiet=!G.over&&!paused&&(busy||!pending||pending.p.isBot||(!viewOpen&&false)||(pending.type==='attack'&&sel.mode!=='reshuffle'));
+  pr.className='prompt'+(calm?' calm':'')+(pquiet?' quiet':'');
+  $('table').classList.toggle('myturn',!!(pending&&!pending.p.isBot&&viewOpen&&!busy&&!G.over)); pr.innerHTML=`<span class="msg"><span class="t">${t}</span><span class="s">${sub}</span></span><span class="row">${btns}${showT?'<span class="tnum"></span>':''}</span>`;
   if(showT){ if(!tTick||!pendingTimed||pendingTimed!==pending) { pendingTimed=pending; startTimer(); } else tickTimer(); } else { stopTimer(); pendingTimed=null; }
   const dn=$('done'); if(dn) dn.onclick=()=>step(null);
   const sh=$('shuf'); if(sh) sh.onclick=()=>{ shuffle(me.table); sel.swapA=null; render(); };
@@ -1783,7 +1827,7 @@ function renderEmpire(){
   $('entlist').innerHTML=ENT.map(e=>{ const own=ME.ent.includes(e.id), isNext=nx&&nx.id===e.id;
     const right= own?'<span class="ok">✓ твоё</span>': isNext?`<button class="${ME.v>=e.cost?'primary':''}" data-buy="${e.id}" ${ME.v>=e.cost?'':'disabled'}>${VIC} ${fmt(e.cost)}</button>`:`<small>${VIC} ${fmt(e.cost)}</small>`;
     return `<div class="ent ${own?'own':''} ${!own&&!isNext?'lock':''}"><span class="ic">${entIc(e)}</span><span><b>${e.name}</b><small>+${fmt(e.inc)} копеек за партию</small></span>${right}</div>`; }).join('');
-  $('entlist').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{ const e=ENT.find(x=>x.id===b.dataset.buy); if(!e||ME.v<e.cost) return; ME.v-=e.cost; ME.ent.push(e.id); saveMe(); updateMeChip(); renderEmpire(); });
+  $('entlist').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{ const e=ENT.find(x=>x.id===b.dataset.buy); if(!e||ME.v<e.cost) return; ME.v-=e.cost; ME.ent.push(e.id); saveMe(); updateMeChip(); renderEmpire(); entCelebrate(e); });
 }
 function renderShop(){
   if(!ME) return; $('shopbal').textContent=balHTML();
@@ -1944,7 +1988,7 @@ document.addEventListener('click',e=>{
   const tutRun=G&&G.tut&&!G.over&&coach.on; const post=postTut.on;
   if(!tutRun&&!post) return;
   const t=e.target;
-  if(t.closest('#coach .tip')||t.closest('#musicbtn')) return;
+  if(t.closest('#coach .tip')||t.closest('#musicbtn')||t.closest('.entcele')) return;
   const allow=post?postTut.allow:coach.allow;
   if(allow&&t.closest(allow)) return;
   e.stopPropagation(); e.preventDefault();
@@ -2124,6 +2168,24 @@ document.addEventListener('pointerdown',e=>{
   if(vk.inp&&!e.target.closest('.vk')&&!e.target.closest('.sugg')) vkClose();
 },true);
 document.addEventListener('focusin',e=>{ const t=vkTarget(e.target); if(t&&isRot()){ t.blur(); } });
+// ---------- a new enterprise is an event ----------
+function entCelebrate(e){
+  const idx=ENT.indexOf(e), nx=nextEnt(ME), total=incomeOf(ME);
+  const w=document.createElement('div'); w.className='entcele';
+  const pic=e.img?`<img src="${e.img}" alt="">`:`<span class="ecemoji">${e.ic}</span>`;
+  const need=nx?Math.max(0,nx.cost-ME.v):0, pct=nx?Math.min(100,Math.round(ME.v/nx.cost*100)):100;
+  w.innerHTML=`<div class="ecwrap">
+    <div class="ecphoto"><div class="ecframe">${pic}</div><div class="ecstamp">ОТКРЫТО</div></div>
+    <div class="ecinfo">
+      <small class="eckick">Новое предприятие · ${idx+1} из ${ENT.length}</small>
+      <h2>${e.name}</h2>
+      <div class="ecstats"><div><b>+${fmt(e.inc)}</b><span>${KIC} копеек за партию</span></div><div><b>${fmt(total)}</b><span>весь доход за партию</span></div></div>
+      ${nx?`<div class="ecnext"><div class="ecnrow"><span>Следующее: <b>${nx.name}</b></span><span>${need?`ещё ${VIC} ${fmt(need)}`:'уже хватает!'}</span></div><div class="ecbar"><i style="--p:${pct}%"></i></div><small>${need?`${VIC} ${fmt(ME.v)} из ${fmt(nx.cost)} ваучеров`:`${VIC} ${fmt(ME.v)} ваучеров — можно открыть прямо сейчас`}</small></div>`:`<div class="ecnext"><b>Вся империя собрана.</b></div>`}
+      <button class="primary big" id="ecok">Дальше</button>
+    </div></div>`;
+  document.body.appendChild(w); void w.offsetWidth; w.classList.add('on');
+  w.querySelector('#ecok').onclick=()=>{ w.classList.remove('on'); setTimeout(()=>w.remove(),400); };
+}
 // ---------- in-game notices instead of browser alert() ----------
 function kAlert(text,opts){
   opts=opts||{}; const w=document.createElement('div'); w.className='knote';
@@ -2197,7 +2259,7 @@ function tickTimer(){
   const left=Math.max(0,tDeadline-Date.now()); const sec=Math.ceil(left/1000);
   const num=document.querySelector('#prompt .tnum'), bar=null, at=document.querySelector('.aim .atime');
   if(num){ num.textContent=`0:${String(sec).padStart(2,'0')}`; num.classList.toggle('hot',sec<=10); }
-  let tc=$('tclock'); if(!tc){ tc=document.createElement('div'); tc.id='tclock'; tc.className='tclock'; document.body.appendChild(tc); } tc.hidden=false; tc.innerHTML=`<i></i>0:${String(sec).padStart(2,'0')}`; tc.classList.toggle('hot',sec<=10);
+  let tc=$('tclock'); const ha=document.querySelector('#table .hand-area'); if(!tc){ tc=document.createElement('div'); tc.id='tclock'; tc.className='tclock'; } if(ha&&tc.parentElement!==ha) ha.appendChild(tc); tc.hidden=false; tc.innerHTML=`<i></i>0:${String(sec).padStart(2,'0')}`; tc.classList.toggle('hot',sec<=10);
   if(at){ at.textContent=`0:${String(sec).padStart(2,'0')}`; at.classList.toggle('hot',sec<=10); }
   if(bar){ bar.style.transform=`scaleX(${left/(tLimit()*1000)})`; bar.classList.toggle('hot',sec<=10); }
   if(left<=0){ stopTimer(); onTimeout(); }
