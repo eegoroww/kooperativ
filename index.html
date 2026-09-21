@@ -163,7 +163,8 @@ button.big{width:100%;font-family:var(--display);font-size:20px;letter-spacing:.
 .duel .vt{font-family:var(--display);font-size:34px;letter-spacing:.04em}
 .duel .verdict.pierce .vt{color:#FF9C8C}.duel .verdict.reflect .vt{color:var(--brass)}.duel .verdict.block .vt{color:var(--paper-dim)}.duel .verdict.dummy .vt{color:#E0A070}
 .duel .why{font-size:17px;color:var(--paper);margin-top:8px;max-width:640px;margin-left:auto;margin-right:auto;text-wrap:balance}
-.slotpos.gap{z-index:0!important;opacity:.5}
+.slotpos.gap{z-index:0!important;opacity:.5;width:calc(var(--cw,72px) * .5)!important}
+.slotpos.gap .cardbox span{display:none}
 .slotpos.gap .cardbox{aspect-ratio:1851/2794;border:1px dashed var(--line);border-radius:var(--card-r);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--line);text-transform:uppercase;letter-spacing:.1em}
 .slotpos .lingbadge{position:absolute;left:4%;right:4%;bottom:5%;text-align:center;font-family:var(--display);font-size:10px;padding:3px 2px;border-radius:4px;border:1px solid;pointer-events:none;text-shadow:0 1px 2px #000;z-index:2}
 .slotpos .lingbadge.pierce{background:rgba(122,26,28,.92);border-color:#E9B4A8;color:#FFD9CF}.slotpos .lingbadge.reflect{background:rgba(201,162,74,.92);border-color:#FFF1C9;color:#3A2416}.slotpos .lingbadge.dummy{background:rgba(184,84,30,.92);border-color:#FFE7C2;color:#FFE7C2}.slotpos .lingbadge.block{background:rgba(60,45,32,.92);border-color:var(--paper-dim);color:var(--paper)}
@@ -399,6 +400,9 @@ th{color:var(--brass);font-weight:500;font-size:12px;text-transform:uppercase;le
 .aimstake{font-family:var(--display);color:var(--tc,var(--brass));font-size:15px;text-shadow:0 1px 3px #000}
 .aimhead .atime{font-family:var(--display);color:var(--brass);font-size:15px}.aimhead .atime.hot{color:#FF6B5A}
 .reshuf-mini{padding:2px 10px;font-size:11px;border-radius:5px;background:rgba(0,0,0,.35)}
+.slotpos .lock,.aimcard .lock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(14px,calc(var(--cw,60px) * .35),34px);filter:drop-shadow(0 2px 4px #000);pointer-events:none;z-index:4}
+.slotpos.locked .face,.aimcard.locked .cf{filter:brightness(.55) saturate(.6)}
+.aimcard.locked{cursor:not-allowed}
 /* ---------- music ---------- */
 .musicbtn{position:absolute;right:calc(max(20px,var(--sr)) + 56px);top:max(12px,var(--st));z-index:2;width:34px;height:30px;padding:0;border-radius:6px;font-size:16px;background:rgba(0,0,0,.4)}
 .musicbtn.off{opacity:.45;text-decoration:line-through}
@@ -845,8 +849,9 @@ function* play(G, firstId){
 }
 
 // ---------- Variant 2: напёрстки ----------
-function v2Remove(G,p,idx){ const sid=p.table[idx].sid; p.table[idx]=null; delete G.known[p.id][idx]; return sid; }
-function v2Add(p,sid){ const g=p.table.indexOf(null); if(g>=0){ p.table[g]={kind:'shield',sid}; return g; } p.table.push({kind:'shield',sid}); return p.table.length-1; }
+function v2Remove(G,p,idx){ const sid=p.table[idx].sid; p.table[idx]=null; delete G.known[p.id][idx]; if(G.immune) delete G.immune[p.id+':'+idx]; return sid; }
+function isImmune(G,pid,i){ return !!(G.immune&&G.immune[pid+':'+i]); }
+function v2Add(p,sid){ p.table.push({kind:'shield',sid}); return p.table.length-1; }
 function* v2Give(G,from,to,n,forcedIdx){
   const got=[];
   for(let i=0;i<n;i++){
@@ -855,7 +860,8 @@ function* v2Give(G,from,to,n,forcedIdx){
     const sid=v2Remove(G,from,ref.idx); got.push(sid);
     ev(G,{kind:'move',from:from.id,to:to.id,sid,slot:ref.idx});
   }
-  for(const sid of got){ const at=v2Add(to,sid); to.shieldsWon++; G.known[to.id][at]=sid; }
+  for(const sid of got){ const at=v2Add(to,sid); to.shieldsWon++; G.known[to.id][at]=sid; G.immune=G.immune||{}; G.immune[to.id+':'+at]=1; }
+  if(got.length) say(G,'o-sys',`${to.name}: трофей лёг последним и под замком до своего хода.`);
   while(realCount(to)>G.opts.v2limit){
     const ref = yield {type:'over',p:to,v2:true};
     const sid=v2Remove(G,to,ref.idx); G.shieldDiscard.push(sid); G.stats.shieldOut[sid]++;
@@ -870,15 +876,18 @@ function* playV2(G, firstId){
     if(G.turn>G.cap){ G.over=true; G.capped=true; say(G,'o-sys','Достигнут лимит атак, партия остановлена.'); return; }
     for(const q of alive(G)){ if(q!==cur){ q.idle++; } else { G.stats.idleSum+=q.idle; G.stats.idleN++; if(q.idle>G.stats.maxIdle) G.stats.maxIdle=q.idle; q.idle=0; } }
     if(G.opts.v2draw==='one'){ if(cur.atk.length<G.opts.v2hand) drawAtk(G,cur,1); } else drawAtk(G,cur,Math.max(1,G.opts.v2hand-cur.atk.length));
+    if(G.immune){ for(const k in G.immune) if(k.startsWith(cur.id+':')) delete G.immune[k]; }
+    if(cur.table.some(x=>!x)){ const map={}; let j=0; cur.table.forEach((x,i)=>{ if(x) map[i]=j++; }); cur.table=cur.table.filter(Boolean); const nk={}; for(const k in G.known[cur.id]){ if(map[k]!=null) nk[map[k]]=G.known[cur.id][k]; } G.known[cur.id]=nk; }
     const targets=alive(G).filter(q=>q.id!==cur.id);
     const dec = yield {type:'attack',p:cur,targets,superTypes:[],v2:true};
     if(dec.pass){
       say(G,'o-sys',`${cur.name}: время вышло, ход сгорел.`); ev(G,{kind:'pass',pid:cur.id}); G.stats.passes=(G.stats.passes||0)+1;
     } else if(dec.reshuffle){
-      cur.table=cur.table.filter(Boolean); if(cur.isBot) shuffle(cur.table);
+      cur.table=cur.table.filter(Boolean); if(cur.isBot) shuffle(cur.table); if(G.immune){ for(const k in G.immune) if(k.startsWith(cur.id+':')) delete G.immune[k]; }
       G.known[cur.id]={}; G.stats.reshuffles2++;
       say(G,'o-sys',`${cur.name} перекладывает свои карты вместо атаки.`); ev(G,{kind:'reshuffle',pid:cur.id});
     } else {
+      if(isImmune(G,dec.targetId,dec.slot)){ const free=G.players[dec.targetId].table.map((x,i)=>x&&!isImmune(G,dec.targetId,i)?i:-1).filter(i=>i>=0); if(free.length) dec.slot=pick(free); }
       const tgt=G.players[dec.targetId]; const slot=tgt.table[dec.slot];
       const idxs=[...dec.cardIdxs].sort((a,b)=>b-a); const cards=idxs.map(i=>cur.atk.splice(i,1)[0]); const n=cards.length; const t=cards[0].type;
       G.discard.push(...cards); G.stats.atkPlayed[t]+=n; G.stats.stakeN[n]++; cur.attacksMade++;
@@ -954,7 +963,7 @@ const BotV2={
     const byType={}; p.atk.forEach((c,i)=>{(byType[c.type]=byType[c.type]||[]).push(i);});
     if(smart){
       let best=null;
-      for(const tgt of targets){ for(let i=0;i<tgt.table.length;i++){ const k=G.known[tgt.id][i]; if(!k||k==='dummy'||!tgt.table[i]) continue;
+      for(const tgt of targets){ for(let i=0;i<tgt.table.length;i++){ const k=G.known[tgt.id][i]; if(!k||k==='dummy'||!tgt.table[i]||isImmune(G,tgt.id,i)) continue;
         for(const t in byType){ if(SHIELDS[k].vuln.includes(t)){ const n=Math.min(3,byType[t].length,realCount(tgt)); const score=n*10+(realCount(tgt)<=n?5:0); if(!best||score>best.score) best={targetId:tgt.id,slot:i,cardIdxs:byType[t].slice(0,n),score}; } } } }
       if(best) return best;
       const expIdx=Object.entries(G.known[p.id]).filter(([i,k])=>k!=='dummy'&&p.table[+i]).map(([i])=>+i);
@@ -963,7 +972,7 @@ const BotV2={
     }
     const weakest=Math.min(...targets.map(q=>realCount(q)));
     const tgt = smart ? pick(targets.filter(q=>realCount(q)===weakest)) : pick(targets);
-    let slots=tgt.table.map((s,i)=>s?i:-1).filter(i=>i>=0);
+    let slots=tgt.table.map((s,i)=>s&&!isImmune(G,tgt.id,i)?i:-1).filter(i=>i>=0); if(!slots.length) slots=tgt.table.map((s,i)=>s?i:-1).filter(i=>i>=0);
     if(smart){ const unknown=slots.filter(i=>!G.known[tgt.id][i]); if(unknown.length) slots=unknown; }
     const slot=pick(slots);
     let t;
@@ -1282,13 +1291,14 @@ function kioskHTML(p,own,openCards,ctx){
     if(ling){ up=true; cls+=' linger'; }
     const lingMark = ling ? `<span class="lingbadge ${lingerSlot.outcome}">${outcomeLabel(lingerSlot.outcome)}</span>` : '';
     const knownMark = v2 && G.opts.v2known && G.known[p.id][i] ? '<span class="known" title="эта карта уже вскрывалась">👁</span>' : '';
-    if(canTarget) cls+=' pick'; if(sel.target===p.id&&sel.slot===i) cls+=' sel';
+    const locked=v2&&isImmune(G,p.id,i); if(locked) cls+=' locked';
+    if(canTarget&&!locked) cls+=' pick'; if(sel.target===p.id&&sel.slot===i) cls+=' sel';
     if(pickingBlind&&pending.target.id===p.id&&pending.options.includes(i)) cls+=' pick';
     if(pickingOwn&&isMe&&(s.kind==='shield'||pending.type==='attack')&&!(v2&&pending.type==='attack'&&sel.mode!=='reshuffle'&&!sel.swapsLeft)) cls+=' pick';
     if(isMe&&sel.swapA&&sel.swapA.from==='table'&&sel.swapA.idx===i) cls+=' sel';
     if(up) cls+=' up';
     const plate = '';
-    return `<div class="${cls}" data-p="${p.id}" data-i="${i}" ${fanStyle}><div class="cardbox"><div class="card3d${up?' up':''}"><div class="face back" style="background-image:url(${IMG.shBack})"></div><div class="face front">${slotFace(s)}</div></div><span class="slot-num">${i+1}</span>${knownMark}${lingMark}</div>${plate}</div>`;
+    return `<div class="${cls}" data-p="${p.id}" data-i="${i}" ${fanStyle}><div class="cardbox"><div class="card3d${up?' up':''}"><div class="face back" style="background-image:url(${IMG.shBack})"></div><div class="face front">${slotFace(s)}</div></div><span class="slot-num">${i+1}</span>${knownMark}${lingMark}${(v2&&isImmune(G,p.id,i))?'<span class="lock" title="Трофей под замком до хода владельца">🔒</span>':''}</div>${plate}</div>`;
   }).join('');
   const cols = '';
   const turnNow = pending && pending.p.id===p.id && !G.over;
@@ -1450,7 +1460,7 @@ const SLIDES=[
   {h:'Атаки',cls:'icons',p:'Шесть видов давления. Атака бьёт по одной закрытой карте соперника: пробила — щит твой, отразилась — отдаёшь свой, удержал — ничего.',vis:()=>TYPE_IDS.map(t=>`<div class="tico"><img src="${IMG.icon(t)}" alt="">${TYPES[t].name}</div>`).join('')},
   {h:'Ушёл на базу',p:'Среди щитов одна пустышка. Попал в неё — приехал, а внутри никого. Промах, ход дальше. Чем меньше у тебя щитов, тем чаще по тебе промахиваются.',vis:()=>`<div class="hcard"><div class="cardbox"><div class="cf cf-dummy" style="background-image:url(${IMG.base})"></div></div></div>`},
   {h:'Ставка',p:'Можно поставить одну, две или три карты одного вида на одну позицию. Пробил — забираешь столько же щитов, отразили — столько же отдаёшь. В начале хода берёшь только одну карту, так что большая ставка стоит темпа.',cls:'stakevis',vis:()=>`<div class="hcard">${attackFace({type:'lens',name:'Налоговая инспекция',img:'lens-tax'})}</div><div class="hcard">${attackFace({type:'lens',name:'Пожарная инспекция',img:'lens-fire'})}</div>`},
-  {h:'Память',p:'Вскрытая карта возвращается на своё место. Запоминай, что где лежит, и считай, какие щиты уже вышли. Переложить свои карты можно только вместо атаки.',cls:'memvis',vis:()=>`<div class="hcard" style="--r:-8deg"><div class="cardbox">${backFace(IMG.shBack)}<span class="num">1</span></div></div><div class="hcard" style="--r:0deg;transform:translateY(-14px)"><div class="cardbox">${shieldFace('market')}<span class="num">2</span></div></div><div class="hcard" style="--r:8deg"><div class="cardbox">${backFace(IMG.shBack)}<span class="num">3</span></div></div>`}
+  {h:'Память',p:'Вскрытая карта возвращается на своё место. Запоминай, что где лежит, и считай, какие щиты уже вышли. Отнятый щит ложится последним и стоит под замком до хода нового хозяина. В свой ход он решает: спрятать ряд или рискнуть и атаковать.',cls:'memvis',vis:()=>`<div class="hcard" style="--r:-8deg"><div class="cardbox">${backFace(IMG.shBack)}<span class="num">1</span></div></div><div class="hcard" style="--r:0deg;transform:translateY(-14px)"><div class="cardbox">${shieldFace('market')}<span class="num">2</span></div></div><div class="hcard" style="--r:8deg"><div class="cardbox">${backFace(IMG.shBack)}<span class="num">3</span></div></div>`}
 ];
 let slideI=0;
 function showIntro(){ slideI=0; $('intro').hidden=false; renderIntro(); }
@@ -1491,14 +1501,14 @@ function openAim(pid){
   const stype=sel.cards.length?me.atk[sel.cards[0]].type:null;
   if(stype) ov.style.setProperty('--tc',TCOLOR[stype]);
   let pickI=(sel.target===pid)?sel.slot:null;
-  const cards=p.table.map((s,i)=>{ if(!s) return ''; const k=i-(nS-1)/2; const ling=lingerSlot&&lingerSlot.pid===pid&&lingerSlot.slot===i;
-    return `<div class="aimcard ${pickI===i?'sel':''}" data-i="${i}" style="--rot:${(k*5).toFixed(1)}deg;--dy:${(Math.abs(k)*4).toFixed(0)}px"><div class="cardbox">${ling?`<div class="face front" style="transform:none">${slotFace(s)}</div>`:backFace(IMG.shBack)}<span class="slot-num">${i+1}</span></div></div>`; }).join('');
+  const cards=p.table.map((s,i)=>{ if(!s) return ''; const k=i-(nS-1)/2; const ling=lingerSlot&&lingerSlot.pid===pid&&lingerSlot.slot===i; const lk=isImmune(G,pid,i);
+    return `<div class="aimcard ${pickI===i?'sel':''} ${lk?'locked':''}" data-i="${i}" style="--rot:${(k*5).toFixed(1)}deg;--dy:${(Math.abs(k)*4).toFixed(0)}px"><div class="cardbox">${ling?`<div class="face front" style="transform:none">${slotFace(s)}</div>`:backFace(IMG.shBack)}<span class="slot-num">${i+1}</span>${lk?'<span class="lock">🔒</span>':''}</div></div>`; }).join('');
   const n=sel.cards.length;
   ov.innerHTML=`<div class="aimhead"><b>${p.name}</b><span>щитов ${realCount(p)}</span><span class="atime"></span></div><div class="aimfan">${cards}</div>
     <div class="aimfoot"><button id="aimclose">Отмена</button><span class="aimstake">${n} × ${stype?TYPES[stype].name:''} · на кону ${n} щит${n>1?'а':''}</span><button class="primary" id="aimfire" ${pickI==null?'disabled':''}>Бить</button></div>`;
   document.body.appendChild(ov); requestAnimationFrame(()=>ov.classList.add('in'));
   ov.querySelector('#aimclose').onclick=()=>{ ov.remove(); };
-  ov.querySelectorAll('.aimcard').forEach(el=>el.onclick=()=>{ pickI=+el.dataset.i; ov.querySelectorAll('.aimcard').forEach(x=>x.classList.toggle('sel',x===el)); ov.querySelector('#aimfire').disabled=false; });
+  ov.querySelectorAll('.aimcard:not(.locked)').forEach(el=>el.onclick=()=>{ pickI=+el.dataset.i; ov.querySelectorAll('.aimcard').forEach(x=>x.classList.toggle('sel',x===el)); ov.querySelector('#aimfire').disabled=false; });
   ov.querySelector('#aimfire').onclick=()=>{ if(pickI==null) return; ov.remove(); const idxs=sel.cards.slice(); resetSel(); step({targetId:pid,slot:pickI,cardIdxs:idxs}); render(true); };
   tickTimer();
 }
