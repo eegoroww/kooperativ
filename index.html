@@ -483,6 +483,12 @@ body:not(.dev) #autoplay{display:none}
 .loading .lplayers div.won{background:var(--brass);border-color:var(--brass);transform:scale(1.12)}
 .loading .lplayers div.won b,.loading .lplayers div.won{color:var(--ink)}
 .loading .lplayers b{display:block;font-family:var(--display);font-weight:400;font-size:14px;color:var(--paper)}
+.loading .lsub.win{font-family:var(--display);font-size:clamp(18px,6vh,30px);letter-spacing:.04em;color:#FFE2A8;text-transform:none}
+.loading>*{transition:opacity .5s}
+.loading.count>*:not(.lcount){opacity:.08}
+.loading .lcount{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:clamp(90px,34vh,180px);color:var(--brass);text-shadow:6px 8px 0 #1A0305;opacity:0}
+.loading .lcount.tick{animation:ltick .75s ease-out}
+@keyframes ltick{0%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}25%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.85)}}
 .loading .lsub{font-size:12px;color:var(--paper-dim);letter-spacing:.1em}
 .result{position:fixed;inset:0;z-index:88;background:rgba(10,1,2,0);display:flex;align-items:center;justify-content:center;padding:max(10px,var(--st)) max(16px,var(--sr)) max(10px,var(--sb)) max(16px,var(--sl));transition:background .8s}
 .result.on{background:rgba(12,1,3,.95)}
@@ -527,6 +533,62 @@ body:not(.dev) #autoplay{display:none}
 .table.myturn #me .hcard{transition:filter .4s}
 .kiosk.cur{animation:curglow 1.8s ease-in-out infinite}
 @keyframes curglow{0%,100%{box-shadow:0 0 0 2px var(--brass),0 0 18px rgba(217,168,104,.25),0 14px 30px rgba(0,0,0,.55)}50%{box-shadow:0 0 0 2px var(--brass),0 0 44px rgba(217,168,104,.6),0 14px 30px rgba(0,0,0,.55)}}
+/* ---------- cover doors ---------- */
+.door{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.door span{font-family:var(--display);font-size:clamp(18px,5.4vh,24px);letter-spacing:.04em}
+.door small{font-family:var(--body);font-size:11px;letter-spacing:.06em;text-transform:none;opacity:.75;font-weight:500}
+.door.own{background:linear-gradient(180deg,#2A0507,#1A0304);color:var(--brass);border:1px solid var(--brass)}
+/* ---------- table size ---------- */
+.sizepick{z-index:88}
+.szcard{width:min(640px,100%);background:var(--panel);border:1px solid var(--brass);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;max-height:100%;overflow:auto}
+.szcard h2{margin:0;text-align:center}.szcard p{margin:0;text-align:center;font-size:13px}
+.sztiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sztile{position:relative;aspect-ratio:1851/2400;max-height:calc(var(--vh) * 46);border-radius:12px;border:2px solid rgba(217,168,104,.4);padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(26,3,5,.35),rgba(26,3,5,.85)),var(--bk) center/cover;box-shadow:0 10px 24px rgba(0,0,0,.5);transition:transform .15s,border-color .15s}
+.sztile:hover,.sztile.on{border-color:var(--brass)}
+.sztile:active{transform:scale(.97)}
+.sztile .szn{font-family:var(--display);font-size:clamp(40px,15vh,70px);line-height:1;color:#FFE2A8;text-shadow:3px 4px 0 #2A0406}
+.szchairs{display:flex;gap:4px}.szchairs i{width:12px;height:12px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 2px #2A0406}
+.sztile small{font-family:var(--display);font-size:13px;color:var(--paper)}
+/* ---------- the pager ---------- */
+.olwrap{width:min(820px,100%);max-height:100%;overflow:auto;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(16px,4vw,40px);align-items:center;background:radial-gradient(ellipse at 20% 50%,rgba(90,14,18,.9),rgba(20,2,4,.96) 70%);border:1px solid rgba(217,168,104,.35);border-radius:16px;padding:clamp(12px,3vh,24px) clamp(14px,3vw,28px)}
+.ol-left{display:flex;justify-content:center}
+.pager{position:relative;width:clamp(190px,calc(var(--vh) * 58),260px);transform:rotate(-4deg);filter:drop-shadow(0 18px 30px rgba(0,0,0,.7))}
+.pg-ant{position:absolute;right:22px;top:-14px;width:14px;height:24px;border-radius:5px 5px 0 0;background:linear-gradient(90deg,#1b1b1d,#3a3a3e,#1b1b1d)}
+.pg-body{position:relative;border-radius:22px 22px 28px 28px;padding:12px 14px 14px;background:linear-gradient(160deg,#3b3c40 0%,#1c1d20 55%,#101114 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.12),inset 0 -3px 8px rgba(0,0,0,.6)}
+.pg-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pg-top span{font-family:var(--display);font-size:10px;letter-spacing:.18em;color:#8b8d93}
+.pg-led{width:8px;height:8px;border-radius:50%;background:#3a1010;box-shadow:inset 0 0 2px #000}
+.pg-led.blink{background:#ff4b3a;box-shadow:0 0 8px #ff4b3a;animation:pulse 1s infinite}
+.pg-lcd{border-radius:6px;padding:8px 10px 6px;background:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px),linear-gradient(180deg,#A9B78E,#8E9E72);box-shadow:inset 0 2px 6px rgba(0,0,0,.45),0 0 0 3px #0c0d0f;color:#1E2914;font-family:'Courier New',monospace;display:flex;flex-direction:column;gap:2px;min-height:86px}
+.pg-lcd small{font-size:11px;font-weight:700;letter-spacing:.08em}
+.pg-lcd b{font-size:clamp(30px,10vh,40px);letter-spacing:.22em;line-height:1.05;text-shadow:1px 1px 0 rgba(0,0,0,.12)}
+.pg-lcd b.word{font-size:clamp(20px,6.5vh,28px);letter-spacing:.06em}
+.pg-lcd em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.08em;min-height:13px}
+.pg-btns{display:flex;justify-content:center;gap:14px;margin-top:12px}
+.pg-btns i{width:34px;height:12px;border-radius:6px;background:linear-gradient(180deg,#56575c,#2a2b2f);box-shadow:0 2px 0 #0a0a0c}
+.pg-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.pg-key{height:clamp(26px,7.5vh,36px);padding:0;border-radius:8px;border:none;background:linear-gradient(180deg,#5a5b61,#2d2e33);color:#eee;font-family:var(--display);font-size:16px;box-shadow:0 3px 0 #0a0a0c}
+.pg-key:active{transform:translateY(2px);box-shadow:0 1px 0 #0a0a0c}
+.pg-key.fn{color:var(--brass)}
+.ol-right{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ol-right h2{margin:0;font-size:clamp(20px,6vh,28px)}
+.ol-right p{margin:0;font-size:13px}
+.ol-choices{display:flex;flex-direction:column;gap:10px}
+.ol-choice{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 16px;border-radius:10px;text-align:left}
+.ol-choice b{font-family:var(--display);font-weight:400;font-size:18px}
+.ol-choice small{font-size:12px;opacity:.8}
+.ol-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ol-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ol-actions button{flex:1;min-width:130px}
+.pg-seats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.pg-seat{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;border:1px dashed rgba(217,168,104,.3);min-width:0}
+.pg-seat.in{border-style:solid;border-color:rgba(217,168,104,.6);background:rgba(217,168,104,.08)}
+.pg-seat .av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--brass);color:var(--ink);font-family:var(--display);display:flex;align-items:center;justify-content:center}
+.pg-seat .av.wait{background:transparent;border:2px dashed rgba(217,168,104,.4)}
+.pg-seat b{display:block;font-family:var(--display);font-weight:400;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg-seat small{font-size:11px;color:var(--paper-dim)}
+.pg-seat>span:last-child{min-width:0}
 /* ---------- online lobby ---------- */
 .altplay{display:flex;gap:6px;justify-content:center;align-items:center;color:var(--paper-dim);font-size:12px}
 .olcard h2{text-align:center;margin:0}
@@ -538,13 +600,19 @@ body:not(.dev) #autoplay{display:none}
 .oljoin{display:flex;gap:10px;justify-content:center;align-items:center}
 .oljoin input{width:150px;text-align:center;font-family:var(--display);font-size:32px;letter-spacing:.3em;padding:6px 8px;background:rgba(0,0,0,.35);border:1px solid var(--brass);border-radius:10px;color:#FFE2A8}
 .olerr{color:#FF9C8C;text-align:center;margin:0;font-size:13px}
+/* ---------- trophy landing ---------- */
+.slotpos.landing .lock{opacity:0}
+.slotpos.lockslam .lock{animation:lockslam .55s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes lockslam{0%{opacity:0;transform:translate(-50%,-50%) scale(2.6) rotate(-18deg)}60%{opacity:1;transform:translate(-50%,-50%) scale(.9) rotate(4deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.slotpos.landing .cardbox{box-shadow:0 0 0 2px var(--brass),0 0 22px rgba(217,168,104,.6)}
 /* ---------- own-row spotlight (extra / give shield) ---------- */
 .slotpos.incoming{visibility:hidden}
-.ospot{position:fixed;inset:0;z-index:50;pointer-events:none}
+.ospot{position:fixed;inset:0;z-index:50;pointer-events:none}.ospot .tip,.ospot .mini{pointer-events:auto}
 .ospot .spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(12,1,3,.72),0 0 0 2px var(--brass);transition:all .3s}
 .ospot .tip,.ospot .mini{position:fixed;max-width:300px;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:10px 14px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
 .ospot .tip b{font-family:var(--display);font-weight:400;color:var(--brass);font-size:15px;display:block;margin-bottom:4px}
 .ospot .tip p{margin:0;font-size:13px;line-height:1.4}
+.ospot .sbtns{display:flex;gap:6px;margin-top:8px;pointer-events:auto}.ospot .mini .sbtns{margin:0}.ospot .sbtns button{padding:6px 12px;font-size:12px}
 .ospot .mini{white-space:nowrap;padding:6px 12px;font-family:var(--display);font-size:13px;color:var(--brass)}
 #mine{position:relative;z-index:51}
 /* ---------- tutorial pulse on the real targets ---------- */
@@ -789,12 +857,9 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
       <div class="cover-form">
         <select id="variant" hidden><option value="v2" selected>Вариант 2</option></select><div id="vdesc" hidden></div>
         <button class="mechip" id="mechip" type="button"></button>
-        <div class="fhead"><h3>За столом</h3>
-          <select id="np" hidden><option>2</option><option>3</option><option selected>4</option></select>
-          <div class="numpick"><button type="button" data-n="2">2</button><button type="button" data-n="3">3</button><button type="button" data-n="4" class="on">4</button></div>
-        </div>
-        <button class="primary big" id="findbtn">Найти игру</button>
-        <div class="altplay"><button class="linkbtn" id="onlinebtn" type="button">С друзьями онлайн</button><span>·</span><button class="linkbtn" id="hotseatbtn" type="button">За одним телефоном</button></div>
+        <select id="np" hidden><option>2</option><option>3</option><option selected>4</option></select>
+        <button class="primary big door" id="findbtn"><span>Найти игру</span><small>открытый стол · любой может сесть</small></button>
+        <button class="big door own" id="onlinebtn"><span>Свой стол</span><small>для своих · по коду</small></button>
         <div id="hotseat" hidden><div id="seats" class="seats"></div><button class="primary big" id="start">Раздать</button></div>
       </div>
     </div>
@@ -842,6 +907,7 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 <div id="result" class="result" hidden></div>
 <div id="lobby" class="lobby" hidden></div>
 <div id="olobby" class="lobby" hidden></div>
+<div id="sizepick" class="lobby sizepick" hidden></div>
 <div id="pview" class="pview" hidden></div>
 <div id="intro" class="intro" hidden></div>
 <div id="tour" class="tour" hidden></div>
@@ -1158,7 +1224,7 @@ function* play(G, firstId){
           say(G,'o-pierce',`${sh.name} уязвим к ${TYPES[t].name}. Щит уходит к ${cur.name}.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome});
           yield* giveShields(G,tgt,cur,1,{from:'table',idx:dec.slot}); banNext=true; }
         else if(sh.refl.includes(t)){ outcome='reflect'; G.stats.outcomes.reflect++; G.stats.shieldReflected[slot.sid]++; G.stats.atkReflect[t]++;
-          say(G,'o-reflect',`${sh.name} ОТРАЖАЕТ ${TYPES[t].name}. ${cur.name} отдаёт свой щит ${tgt.name}.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome});
+          say(G,'o-reflect',`${sh.name} ОТРАЖАЕТ ${TYPES[t].name}. ${cur.name} отдаёт свой щит игроку ${tgt.name}.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome});
           yield* giveShields(G,cur,tgt,1); banNext=true; }
         else { outcome='block'; G.stats.outcomes.block++; G.stats.atkBlock[t]++; say(G,'o-block',`${sh.name} просто держит удар.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome}); }
       }
@@ -1239,7 +1305,7 @@ function* playV2(G, firstId){
           say(G,'o-pierce',`${sh.name} уязвим к ${TYPES[t].name}. ${tgt.name} отдаёт ${n} щит${n>1?'а':''}.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome});
           yield* v2Give(G,tgt,cur,n,dec.slot); }
         else if(sh.refl.includes(t)){ outcome='reflect'; G.stats.outcomes.reflect++; G.stats.shieldReflected[slot.sid]++; G.stats.atkReflect[t]+=n; G.stats.stakeReflect[n]++; G.known[tgt.id][dec.slot]=slot.sid;
-          say(G,'o-reflect',`${sh.name} ОТРАЖАЕТ ${TYPES[t].name}. ${cur.name} отдаёт ${n} щит${n>1?'а':''} ${tgt.name}.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome});
+          say(G,'o-reflect',`${sh.name} ОТРАЖАЕТ ${TYPES[t].name}. ${cur.name} отдаёт ${n} щит${n>1?'а':''} игроку ${tgt.name}.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome});
           yield* v2Give(G,cur,tgt,n,null); }
         else { outcome='block'; G.stats.outcomes.block++; G.stats.atkBlock[t]+=n; G.known[tgt.id][dec.slot]=slot.sid; say(G,'o-block',`${sh.name} держит удар. Карта ложится на своё место.`); ev(G,{kind:'reveal',pid:tgt.id,slot:dec.slot,face,outcome}); }
       }
@@ -1582,7 +1648,7 @@ async function revealOverlay(pid,slot,face,outcome){
 }
 let lingerSlot=null;
 function clearLinger(){ hidePeek(true); lingerSlot=null; fx.querySelectorAll('.ovl').forEach(o=>o.remove()); }
-let HIDE={};
+let HIDE={}, LAND=null;
 async function playEvents(){
   if(!G||!G.events.length) return;
   if(typeof netOnEvents==='function') netOnEvents();
@@ -1608,7 +1674,13 @@ async function playEvents(){
         const toS=stallRect(e.to); if(!from||!toS) break;
         const w=Math.max(60,(e.slot!=null?from.width:from.width*0.44));
         const f=e.slot!=null?{left:from.left,top:from.top,width:from.width,height:from.height}:centerRect(from,w);
-        const el=await fly(shieldFace(e.sid),f,centerRect(toS,w*0.8),700,{fade:true}); el.remove(); if(HIDE[e.to]) HIDE[e.to]--;
+        const el=await fly(shieldFace(e.sid),f,centerRect(toS,w*0.8),700,{fade:true}); el.remove();
+        const pl=G.players[e.to], live=pl.table.map((x,i)=>x?i:-1).filter(i=>i>=0), li=live[live.length-(HIDE[e.to]||1)];
+        if(HIDE[e.to]) HIDE[e.to]--;
+        LAND={pid:e.to,i:li}; render(true);
+        const slot=document.querySelector(`.slotpos[data-p="${e.to}"][data-i="${li}"]`);
+        await sleep(650); LAND=null;
+        if(slot){ const own=e.to===meId&&!G.players[e.to].isBot; const c3=slot.querySelector('.card3d'); if(c3&&!own&&!G.over) c3.classList.remove('up'); slot.classList.add('lockslam'); await sleep(620); }
         break; }
       case 'discard': { const s=stallRect(e.pid); if(!s) break; const f=centerRect(s,s.width*0.4); const el=await fly(shieldFace(e.sid),f,{left:f.left,top:f.top+120,width:f.width*0.6,height:f.height*0.6},500,{fade:true}); el.remove(); break; }
       case 'fill': break;
@@ -1635,7 +1707,8 @@ function kioskHTML(p,own,openCards,ctx){
   const slots=p.table.map((s,i)=>{
     const k=i-(nS-1)/2; const fanStyle=`style="--rot:${(k*(own?4:6)).toFixed(1)}deg;--dy:${(Math.abs(k)*(own?3:4)).toFixed(0)}px;--z:${i+1}"`;
     if(!s) return `<div class="slotpos gap" ${fanStyle}><div class="cardbox"><span>пусто</span></div></div>`;
-    let cls='slotpos'+(hideSet.has(i)?' incoming':''), up=openCards;
+    const landing=LAND&&LAND.pid===p.id&&LAND.i===i;
+    let cls='slotpos'+(hideSet.has(i)?' incoming':'')+(landing?' landing':''), up=openCards||landing;
     const ling = lingerSlot && lingerSlot.pid===p.id && lingerSlot.slot===i;
     if(ling){ up=true; cls+=' linger'; }
     const lingMark = ling ? `<span class="lingbadge ${lingerSlot.outcome}">${outcomeLabel(lingerSlot.outcome)}</span>` : '';
@@ -1658,18 +1731,21 @@ function kioskHTML(p,own,openCards,ctx){
   </div>`;
 }
 function ownSpot(){
-  let sp=$('ospot'); const need=G&&!G.over&&!G.tut&&pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&(pending.type==='over'||pending.type==='give');
+  let sp=$('ospot'); const resh=pending&&pending.type==='attack'&&sel.mode==='reshuffle';
+  const need=G&&!G.over&&!G.tut&&pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&(pending.type==='over'||pending.type==='give'||resh);
   if(!need){ if(sp) sp.hidden=true; document.querySelectorAll('#mine .cpulse').forEach(x=>x.classList.remove('cpulse')); return; }
   if(!sp){ sp=document.createElement('div'); sp.id='ospot'; sp.className='ospot'; document.body.appendChild(sp); }
   const win=document.querySelector('#mine .window'); if(!win) return;
   const r=L(win.getBoundingClientRect()), pad=6;
-  const key='koop.seen.'+pending.type; let first=false; try{ first=!localStorage.getItem(key); if(first) localStorage.setItem(key,'1'); }catch(e){}
-  if(sp.dataset.req!==String(G.turn)+pending.type) { sp.dataset.req=String(G.turn)+pending.type; sp.dataset.first=first?'1':''; }
-  const txt=pending.type==='over'?`<b>Лишний щит</b><p>Больше ${G.opts.v2limit} щитов держать нельзя. Нажми щит, который уйдёт в сброс.</p>`:`<b>Отдай щит → ${esc(pending.to.name)}</b><p>Нажми свой щит, который отдаёшь${pending.n>1?' (ещё '+pending.n+')':''}.</p>`;
+  const kind=resh?'reshuffle':pending.type; const key='koop.seen.'+kind; let first=false; try{ first=!localStorage.getItem(key); if(first) localStorage.setItem(key,'1'); }catch(e){}
+  if(sp.dataset.req!==String(G.turn)+kind) { sp.dataset.req=String(G.turn)+kind; sp.dataset.first=first?'1':''; }
+  const rbtn=`<span class="sbtns"><button id="sp_shuf">Перемешать</button><button class="primary" id="sp_done">Готово</button></span>`;
+  const txt=resh?`<b>Перекладываешь</b><p>Нажми две свои карты — они поменяются местами. Или перемешай всё. Это вместо атаки.</p>${rbtn}`:pending.type==='over'?`<b>Лишний щит</b><p>Больше ${G.opts.v2limit} щитов держать нельзя. Нажми щит, который уйдёт в сброс.</p>`:`<b>Отдай щит игроку ${esc(pending.to.name)}</b><p>Нажми свой щит, который отдаёшь${pending.n>1?' (ещё '+pending.n+')':''}.</p>`;
   sp.hidden=false;
-  sp.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>${sp.dataset.first?`<div class="tip">${txt}</div>`:`<div class="mini">${pending.type==='over'?'Лишний щит — в сброс':'Отдай щит'}</div>`}`;
+  sp.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>${sp.dataset.first?`<div class="tip">${txt}</div>`:`<div class="mini">${resh?rbtn:pending.type==='over'?'Лишний щит — в сброс':'Отдай щит'}</div>`}`;
   const tip=sp.querySelector('.tip,.mini'); if(tip) placeTip(tip,r);
-  document.querySelectorAll('#mine .slotpos').forEach(x=>{ const i=+x.dataset.i; const me=G.players[meId]; if(me.table[i]&&me.table[i].kind==='shield'){ x.style.setProperty('--pc','#D9A868'); x.classList.add('cpulse'); } });
+  const b1=$('sp_shuf'), b2=$('sp_done'); if(b1) b1.onclick=()=>{ const me=G.players[meId]; shuffle(me.table); sel.swapA=null; render(); }; if(b2) b2.onclick=()=>step({reshuffle:true});
+  document.querySelectorAll('#mine .slotpos').forEach(x=>{ const i=+x.dataset.i; const me=G.players[meId]; if(me.table[i]&&(resh||me.table[i].kind==='shield')){ x.style.setProperty('--pc','#D9A868'); x.classList.add('cpulse'); } });
 }
 function render(quiet){
   if(!G) return;
@@ -1708,12 +1784,12 @@ function render(quiet){
             sel.target==null ? 'Теперь кликни позицию на чужом ларьке.' : `Бьёшь по «${G.players[sel.target].stall}», позиция ${sel.slot+1}.`;
       if(pending.p.banTarget!=null&&G.opts.turn==='defender'&&G.opts.ban&&alive(G).length>2) sub+=` Обратный удар по ${G.players[pending.p.banTarget].name} запрещён.`;
       btns=`<button id="shuf" title="Перемешать свои карты на ларьке">Перемешать</button>${pending.superTypes.map(x=>`<button class="${sel.superType===x?'primary':''}" data-super="${x}">⚡ Супер ${ico(x)}</button>`).join('')}<button class="primary" id="fire" ${ready?'':'disabled'}>Бить</button>`; break; }
-    case 'give': t=`Отдай ${pending.n} щит${pending.n>1?'а':''} → ${pending.to.name}`; sub=G.opts.variant==='v2'?'Кликни щит, который отдаёшь. Его место останется пустым до перекладывания.':'Кликни щит на своём ларьке или в руке. Дыра на ларьке закроется щитом из руки или пустышкой.'; break;
+    case 'give': t=`Отдай ${pending.n>1?pending.n+' щита':'щит'} игроку ${pending.to.name}`; sub=G.opts.variant==='v2'?'Кликни щит, который отдаёшь. Его место останется пустым до перекладывания.':'Кликни щит на своём ларьке или в руке. Дыра на ларьке закроется щитом из руки или пустышкой.'; break;
     case 'blind': t='Там пустышка!'; sub=`Слепо ткни в любую другую закрытую карту у ${pending.target.name}. Что там лежит, то и заберёшь.`; break;
     case 'over': t='Лишний щит'; sub=`Больше ${G.opts.variant==='v2'?G.opts.v2limit:G.opts.limit} держать нельзя. Кликни щит, который уйдёт в сброс.`; break;
   }
   const showT = timerShouldRun();
-  const pquiet=!G.over&&!paused&&(busy||!pending||pending.p.isBot||(G.online&&pending.p.id!==meId)||pending.type==='over'||pending.type==='give'||(pending.type==='attack'&&sel.mode!=='reshuffle'));
+  const pquiet=!G.over&&!paused&&(busy||!pending||pending.p.isBot||(G.online&&pending.p.id!==meId)||pending.type==='over'||pending.type==='give'||pending.type==='attack');
   pr.className='prompt'+(calm?' calm':'')+(pquiet?' quiet':'');
   $('table').classList.toggle('myturn',!!(pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&!G.over)); pr.innerHTML=`<span class="msg"><span class="t">${t}</span><span class="s">${sub}</span></span><span class="row">${btns}${showT?'<span class="tnum"></span>':''}</span>`;
   if(showT){ if(!tTick||!pendingTimed||pendingTimed!==pending) { pendingTimed=pending; startTimer(); } else tickTimer(); } else { stopTimer(); pendingTimed=null; }
@@ -1888,8 +1964,8 @@ function openLobby(){
   let t=0; people.forEach((p,i)=>{ t+=900+Math.random()*3200; lobbyTimers.push(setTimeout(()=>{ joined[i+1]=true; draw(); if(joined.filter(Boolean).length===n){ lobbyTimers.push(setTimeout(()=>{ closeLobby(); showLoading([{name:ME.nick,isBot:false,coop:ME.coop}].concat(people.map(p=>({name:p.nick,isBot:true,coop:p.coop,persona:p}))),true); },1300)); } },t)); });
 }
 function closeLobby(){ lobbyTimers.forEach(clearTimeout); lobbyTimers=[]; $('lobby').hidden=true; }
-$('findbtn').onclick=openLobby;
-$('hotseatbtn').onclick=()=>{ $('hotseat').hidden=!$('hotseat').hidden; };
+$('findbtn').onclick=()=>{ if(!ME){ showReg(); return; } MM.retry=0; pickSize('Какой стол ищем','Подсадим к тем, кто ищет прямо сейчас. Если никого нет — свободные места займут соперники от игры.',n=>matchFind(n)); };
+
 
 // ---------- registration ----------
 function showReg(){
@@ -2136,7 +2212,7 @@ const POST_STEPS=[
   {sel:'#empirebtn',h:'Твоя империя',p:'Палатка уже твоя. Загляни в «Империю»: там все предприятия, которые можно открыть.',done:()=>$('page-empire').classList.contains('on')},
   {sel:'#entlist [data-buy="lotok"]',h:'Второе предприятие',p:'Трёх ваучеров хватает на «Лоток с пирожками». Покупай, он добавит доход.',done:()=>ME.ent.includes('lotok')},
   {sel:'#page-empire .backbar button',h:'Как расти дальше',p:'Ваучеры дают за каждую партию и больше за победу. Копейки идут с предприятий, их тратят в «Лавке». Возвращайся к столу.',done:()=>!$('page-empire').classList.contains('on')},
-  {sel:'#findbtn',h:'Теперь по-настоящему',p:'Жми «Найти игру». Дальше без подсказок. Удачи, председатель!',done:()=>!$('lobby').hidden}
+  {sel:'#findbtn',h:'Теперь по-настоящему',p:'Жми «Найти игру». Дальше без подсказок. Удачи, председатель!',done:()=>!$('lobby').hidden||!$('sizepick').hidden}
 ];
 function postTutStart(){ postTut.on=true; postTut.step=0; clearInterval(postTut.iv); postTut.iv=setInterval(postTutTick,200); postTutTick(); }
 function postTutTick(){
@@ -2166,9 +2242,11 @@ function showLoading(seats,quick,starter,first,noDraw){
   if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.06,900);
   let finish=3200;
   if(!noDraw&&n>1){
-    const names=el.querySelectorAll('.lplayers>div'); const total=2*n+first; let t=700;
-    for(let k=0;k<=total;k++){ t+=70+Math.pow(k/total,2.4)*300; const kk=k; setTimeout(()=>{ names.forEach((x,j)=>x.classList.toggle('pick',j===kk%n)); if(kk===total){ names[first].classList.add('won'); el.querySelector('.lsub').textContent='Первым ходит '+seats[first].name; } },t); }
-    finish=Math.max(3200,t+1300);
+    const names=el.querySelectorAll('.lplayers>div'); const total=2*n+first; let t=900;
+    for(let k=0;k<=total;k++){ t+=140+Math.pow(k/total,2.2)*520; const kk=k; setTimeout(()=>{ names.forEach((x,j)=>x.classList.toggle('pick',j===kk%n)); if(kk===total){ names[first].classList.add('won'); const ls=el.querySelector('.lsub'); ls.classList.add('win'); ls.textContent='Первым ходит '+seats[first].name; } },t); }
+    const cd=t+2000;
+    [3,2,1].forEach((num,i)=>setTimeout(()=>{ el.classList.add('count'); let c=el.querySelector('.lcount'); if(!c){ c=document.createElement('div'); c.className='lcount'; el.appendChild(c); } c.textContent=num; c.classList.remove('tick'); void c.offsetWidth; c.classList.add('tick'); },cd+i*750));
+    finish=cd+3*750;
   }
   setTimeout(()=>{ (starter||((ss,q)=>startMatch(ss,q,{first})))(seats,quick,first); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; if(G&&!G.over) render(true); if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.2,2500); },380); },finish);
 }
@@ -2329,8 +2407,8 @@ function netApplyAnswer(pid,a){
   return a;
 }
 // ---------- host ----------
-async function netHost(){
-  netClose(); NET.role='host'; NET.people=[]; NET.seatConn={}; NET.ready=false; olRender();
+async function netHost(o){
+  netClose(); NET.open=!!(o&&o.open); NET.role='host'; NET.people=[]; NET.seatConn={}; NET.ready=false; olRender();
   try{ await netLib(); }catch(e){ olRender('Не загрузилась сетевая часть. Проверь интернет.'); return; }
   NET.code=String(1000+Math.floor(Math.random()*9000)); const root=NET_BASE+NET.code;
   let mq=null; for(let b=0;b<NET_BROKERS.length&&!mq;b++){ mq=await netConnect(NET_BROKERS[b],{topic:root+'/all',payload:JSON.stringify({t:'hostgone'}),qos:1}); if(mq) NET.broker=b; }
@@ -2338,31 +2416,31 @@ async function netHost(){
   if(!mq){ olRender('Нет связи с сервером. Проверь интернет и попробуй ещё раз.'); return; }
   NET.mq=mq; NET.root=root; NET.conns={};
   mq.subscribe(root+'/h',{qos:1}); mq.on('connect',()=>mq.subscribe(root+'/h',{qos:1}));
-  mq.on('message',(topic,buf)=>{ let m; try{ m=JSON.parse(buf.toString()); }catch(e){ return; } if(!m||!m.cid) return;
+  mq.on('message',(topic,buf)=>{ let m; try{ m=JSON.parse(buf.toString()); }catch(e){ return; } if(m&&m.t==='ad'){ if(NET.open) mmSeeAd(m); return; } if(!m||!m.cid) return;
     let c=NET.conns[m.cid];
     if(!c){ if(m.t!=='hello') return; c=NET.conns[m.cid]={cid:m.cid,open:true,send:x=>netPub(root+'/c/'+m.cid,x),close(){ this.open=false; netPub(root+'/c/'+m.cid,{t:'kick'}); }}; }
     if(m.t==='bye'){ c.open=false; delete NET.conns[m.cid]; netHostLost(c); return; }
     netHostData(c,m); });
-  NET.ready=true; olRender();
+  NET.ready=true; olRender(); if(NET.open) mmHostReady();
 }
 function netHostData(conn,m){
   if(!m||!m.t) return;
   if(m.t==='hello'){
     if(G&&G.online){ netSend(conn,{t:'busy'}); conn.open=false; delete NET.conns[conn.cid]; return; }
-    if(NET.people.length>=3){ netSend(conn,{t:'full'}); conn.open=false; delete NET.conns[conn.cid]; return; }
-    NET.people=NET.people.filter(x=>x.conn!==conn); NET.people.push({conn,pr:m.pr}); olRender(); netLobbyCast(); return; }
+    if(NET.people.length>=(NET.open?MM.n-1-MM.bots.length:3)){ netSend(conn,{t:'full'}); conn.open=false; delete NET.conns[conn.cid]; return; }
+    NET.people=NET.people.filter(x=>x.conn!==conn); NET.people.push({conn,pr:m.pr}); olRender(); netLobbyCast(); if(NET.open) mmJoined(); return; }
   if(m.t==='ans'){ const pid=Object.keys(NET.seatConn).find(k=>NET.seatConn[k]===conn); if(pid==null) return; const w=NET.waiters[pid]; if(w) w(netApplyAnswer(+pid,m.a||{})); }
 }
 function netHostLost(conn){
   if(G&&G.online){ const pid=Object.keys(NET.seatConn).find(k=>NET.seatConn[k]===conn); if(pid==null) return; delete NET.seatConn[pid];
     const p=G.players[pid]; p.remote=false; p.isBot=true; say(G,'o-sys',`${p.name} отключился, за него доиграет бот.`); const w=NET.waiters[pid]; if(w&&w.drop) w.drop(); render(); return; }
-  NET.people=NET.people.filter(x=>x.conn!==conn); olRender(); netLobbyCast();
+  NET.people=NET.people.filter(x=>x.conn!==conn); olRender(); netLobbyCast(); if(NET.open&&MM.mode==='host') mmScheduleBot(2500);
 }
-function netLobbyCast(){ const list=[netProfile()].concat(NET.people.map(x=>x.pr)); NET.people.forEach(x=>netSend(x.conn,{t:'lobby',people:list,np:Math.max(+$('np').value,list.length)})); }
-function netStart(){
+function netLobbyCast(){ const list=[netProfile()].concat(NET.people.map(x=>x.pr),NET.open?MM.bots.map(b=>({nick:b.nick,coop:b.coop,ent:b.ent})):[]); NET.people.forEach(x=>netSend(x.conn,{t:'lobby',people:list,np:Math.max(+$('np').value,list.length)})); }
+function netStart(fixedBots){
   if(!NET.people.length) return;
   const humans=[{name:ME.nick,coop:ME.coop,isBot:false}].concat(NET.people.map(x=>({name:x.pr.nick,coop:x.pr.coop,isBot:false,remote:true,persona:netPersona(x.pr),conn:x.conn})));
-  const n=Math.max(+$('np').value,humans.length); const bots=pickPeople(n-humans.length).filter(b=>!humans.some(h=>h.name===b.nick)).map(p=>({name:p.nick,isBot:true,coop:p.coop,persona:p}));
+  const n=Math.max(+$('np').value,humans.length); const bots=(fixedBots||pickPeople(n-humans.length)).filter(b=>!humans.some(h=>h.name===b.nick)).map(p=>({name:p.nick,isBot:true,coop:p.coop,persona:p}));
   const seats=humans.concat(bots).slice(0,4);
   NET.seatConn={}; seats.forEach((s,i)=>{ if(s.conn) NET.seatConn[i]=s.conn; });
   const pub=seats.map(s=>({name:s.name,coop:s.coop}));
@@ -2372,9 +2450,9 @@ function netStart(){
   showLoading(seats.map(s=>({name:s.name,coop:s.coop,isBot:s.isBot,remote:!!s.remote,persona:s.persona})),true,(ss,q,f)=>{ NET.starting=false; startMatch(ss,true,{online:true,first:f}); },first);
 }
 // ---------- client ----------
-async function netJoin(code){
-  netClose(); NET.role='client'; NET.code=code; NET.lastSeq=-1; NET.awarded=false; NET.seat=null;
-  olRender('Подключаемся к столу '+code+'…');
+async function netJoin(code,o){
+  netClose(); NET.open=!!(o&&o.open); NET.role='client'; NET.code=code; NET.lastSeq=-1; NET.awarded=false; NET.seat=null;
+  olRender();
   try{ await netLib(); }catch(e){ olRender('Не загрузилась сетевая часть. Проверь интернет.'); return; }
   const cid=netRid(), root=NET_BASE+code;
   for(let b=0;b<NET_BROKERS.length;b++){
@@ -2394,15 +2472,16 @@ async function netJoin(code){
     if(answered){ olRender(); return; }
     try{ mq.end(true); }catch(e){} NET.mq=null; NET.conn=null;
   }
+  if(NET.role==='client'&&NET.code===code&&NET.open){ mmJoinFailed(); return; }
   if(NET.role==='client'&&NET.code===code) olRender('Стола с кодом '+code+' не нашлось. Проверь цифры или попроси хозяина создать стол заново.');
 }
-function netClientLost(){ if(NET.role!=='client') return; const inGame=G&&G.online&&!G.over; NET.role=null; if(inGame){ $('newgame').click(); kAlert('Связь с хозяином стола пропала. Партия прервана.',{title:'Нет связи'}); } else if(!$('olobby').hidden){ olRender('Хозяин закрыл стол.'); } }
+function netClientLost(){ if(NET.role!=='client') return; if(NET.open&&!(G&&G.online)){ mmJoinFailed(); return; } const inGame=G&&G.online&&!G.over; NET.role=null; if(inGame){ $('newgame').click(); kAlert('Связь с хозяином стола пропала. Партия прервана.',{title:'Нет связи'}); } else if(!$('olobby').hidden){ olRender('Хозяин закрыл стол.'); } }
 async function netClientData(m){
   if(!m||!m.t) return;
   if(m.t==='lobby'){ NET.people=m.people; NET.np=m.np; olRender(); return; }
-  if(m.t==='full'){ olRender('За этим столом уже нет мест.'); return; }
-  if(m.t==='busy'){ olRender('За этим столом уже идёт партия.'); return; }
-  if(m.t==='loading'){ NET.seat=m.seat; olClose(); showLoading(m.seats,false,()=>{},m.first); return; }
+  if(m.t==='full'){ if(NET.open){ mmJoinFailed(); return; } olRender('За этим столом уже нет мест.'); return; }
+  if(m.t==='busy'){ if(NET.open){ mmJoinFailed(); return; } olRender('За этим столом уже идёт партия.'); return; }
+  if(m.t==='loading'){ NET.seat=m.seat; olClose(); mmClearTimers(); MM.mode=null; closeLobby(); showLoading(m.seats,false,()=>{},m.first); return; }
   if(m.t==='st'||m.t==='ev'){
     const first=!G||!G.online||$('boardwrap').hidden;
     G=m.G; G.online=true; G.events=[];
@@ -2416,47 +2495,117 @@ async function netClientData(m){
     return; }
 }
 function netClose(){ try{ if(NET.role==='host'&&NET.root) netPub(NET.root+'/all',{t:'hostgone'}); if(NET.conn) NET.conn.close(); }catch(e){} const mq=NET.mq; NET.mq=null; if(mq) setTimeout(()=>{ try{ mq.end(); }catch(e){} },300); NET.conn=null; NET.ready=false; NET.people=[]; NET.seatConn={}; NET.waiters={}; NET.role=null; }
-// ---------- lobby screen ----------
-function olOpen(join){ const el=$('olobby'); el.hidden=false; NET.view=join?'join':'menu'; olRender(); if(join&&typeof join==='string'){ NET.view='join'; olRender(); $('olcode').value=join; netJoin(join); } }
+// ---------- table size ----------
+function pickSize(title,sub,onPick){
+  const w=$('sizepick'); w.hidden=false; const cur=+$('np').value||4; const back=`url(${IMG.shBack})`;
+  w.innerHTML=`<div class="szcard"><h2>${title}</h2>${sub?`<p class="dim">${sub}</p>`:''}
+    <div class="sztiles">${[2,3,4].map(n=>`<button class="sztile ${n===cur?'on':''}" data-n="${n}" style="--bk:${back}"><span class="szn">${n}</span><span class="szchairs">${'<i></i>'.repeat(n)}</span><small>${['','','на двоих','на троих','на четверых'][n]}</small></button>`).join('')}</div>
+    <div class="lfoot"><button id="szback">Отмена</button><span></span></div></div>`;
+  w.querySelectorAll('.sztile').forEach(b=>b.onclick=()=>{ const n=+b.dataset.n; $('np').value=n; w.hidden=true; onPick(n); });
+  $('szback').onclick=()=>{ w.hidden=true; };
+}
+// ---------- open tables: find whoever is looking right now ----------
+const MM={n:4,mode:null,bots:[],timers:[],adT:null,retry:0};
+function mmClearTimers(){ MM.timers.forEach(clearTimeout); MM.timers=[]; clearInterval(MM.adT); MM.adT=null; }
+function mmCancel(){ mmClearTimers(); MM.mode=null; if(NET.role) netClose(); NET.open=false; closeLobby(); }
+async function matchFind(n){
+  MM.n=n; MM.mode='search'; MM.bots=[]; mmClearTimers(); NET.open=true; $('lobby').hidden=false; mmRender();
+  try{ await netLib(); }catch(e){ mmOffline(); return; }
+  let mq=null; for(let b=0;b<NET_BROKERS.length&&!mq;b++) mq=await netConnect(NET_BROKERS[b]);
+  if(MM.mode!=='search'){ if(mq) mq.end(true); return; }
+  if(!mq){ mmOffline(); return; }
+  const topic=NET_BASE+'open/'+n;
+  const ad=await new Promise(res=>{ const t=setTimeout(()=>res(null),1500+Math.random()*2000);
+    mq.on('message',(tp,buf)=>{ let m; try{ m=JSON.parse(buf.toString()); }catch(e){ return; } if(m&&m.t==='ad'&&m.free>0&&m.code){ clearTimeout(t); res(m); } });
+    mq.subscribe(topic,{qos:0}); });
+  try{ mq.end(true); }catch(e){}
+  if(MM.mode!=='search') return;
+  if(ad){ MM.mode='guest'; netJoin(ad.code,{open:true}); } else { MM.mode='host'; netHost({open:true}); }
+}
+function mmOffline(){ mmClearTimers(); MM.mode=null; NET.open=false; closeLobby(); openLobby(); }
+function mmHostReady(){
+  const topic=NET_BASE+'open/'+MM.n; try{ NET.mq.subscribe(topic,{qos:0}); }catch(e){}
+  const ad=()=>{ const free=MM.n-1-NET.people.length-MM.bots.length; if(free>0&&MM.mode==='host') netPub(topic,{t:'ad',code:NET.code,free}); };
+  ad(); MM.adT=setInterval(ad,2000);
+  mmScheduleBot(8000+Math.random()*6000); mmRender();
+}
+function mmScheduleBot(delay){ MM.timers.push(setTimeout(()=>{
+  if(MM.mode!=='host') return; if(1+NET.people.length+MM.bots.length>=MM.n) return;
+  const used=new Set([ME.nick].concat(NET.people.map(x=>x.pr.nick),MM.bots.map(b=>b.nick)));
+  const cand=pickPeople(4).find(p=>!used.has(p.nick)); if(cand) MM.bots.push(cand);
+  mmRender(); netLobbyCast();
+  if(1+NET.people.length+MM.bots.length>=MM.n) mmFull(); else mmScheduleBot(1500+Math.random()*3000);
+},delay)); }
+function mmSeeAd(m){ if(MM.mode!=='host'||!m.code||m.code===NET.code||NET.people.length) return; if(+m.code>+NET.code) return; MM.mode='guest'; MM.bots=[]; mmClearTimers(); netClose(); NET.open=true; netJoin(m.code,{open:true}); }
+function mmJoined(){ mmRender(); if(1+NET.people.length+MM.bots.length>=MM.n) mmFull(); }
+function mmFull(){
+  if(MM.mode!=='host') return; MM.mode='starting'; clearInterval(MM.adT); mmRender(); netLobbyCast();
+  MM.timers.push(setTimeout(()=>{ closeLobby();
+    if(!NET.people.length){ const bots=MM.bots; netClose(); NET.open=false; MM.mode=null; showLoading([{name:ME.nick,isBot:false,coop:ME.coop}].concat(bots.map(p=>({name:p.nick,isBot:true,coop:p.coop,persona:p}))),true); }
+    else { MM.mode=null; netStart(MM.bots); } },1400));
+}
+function mmJoinFailed(){ if(MM.mode!=='guest'&&MM.mode!=='search') return; MM.retry++; if(MM.retry>2){ mmOffline(); return; } MM.mode=null; netClose(); matchFind(MM.n); }
+function mmRender(err){
+  const lb=$('lobby'); if(lb.hidden) return; const n=MM.n;
+  let list=[netProfile()], title='Ищем стол…';
+  if(MM.mode==='host'||MM.mode==='starting'){ list=[netProfile()].concat(NET.people.map(x=>x.pr),MM.bots); title=MM.mode==='starting'?'Все на месте, раздаём':'Ищем соперников…'; }
+  else if(MM.mode==='guest'&&NET.people&&NET.people.length){ list=NET.people; title=list.length>=n?'Все на месте, раздаём':'Ищем соперников…'; }
+  lb.innerHTML=`<div class="lobbycard"><h2>${title}</h2>
+    <div class="lseats" style="grid-template-columns:repeat(${n},1fr)">${Array.from({length:n},(_,i)=>{ const p=list[i]; return p?`<div class="lseat in"><div class="av">${esc(p.nick[0].toUpperCase())}</div><b>${esc(p.nick)}</b><small>«${esc(p.coop)}»${p.ent&&p.ent.length?' · '+esc(topEnt(p).name):''}</small></div>`:`<div class="lseat"><div class="av wait"></div><small>ждём игрока</small></div>`; }).join('')}</div>
+    ${err?`<p class="olerr">${esc(err)}</p>`:''}
+    <div class="lfoot"><span class="dim" style="font-size:12px">Открытый стол на ${n}</span><button id="lobbycancel">Отмена</button></div></div>`;
+  $('lobbycancel').onclick=mmCancel;
+}
+// ---------- own table: the pager ----------
+function pagerHTML(l1,l2,l3,keys){ return `<div class="pager"><div class="pg-ant"></div><div class="pg-body">
+  <div class="pg-top"><span>КООПЕРАТИВ</span><i class="pg-led ${l3==='ЖДЁМ ХОЗЯИНА'||l3==='КОД ДЛЯ СВОИХ'?'blink':''}"></i></div>
+  <div class="pg-lcd"><small>${l1}</small><b class="${String(l2).length>4?'word':''}">${l2}</b><em>${l3||'&nbsp;'}</em></div>
+  ${keys?`<div class="pg-keys">${['1','2','3','4','5','6','7','8','9','del','0','ok'].map(k=>`<button class="pg-key ${k==='ok'||k==='del'?'fn':''}" data-k="${k}">${k==='del'?'⌫':k==='ok'?'✓':k}</button>`).join('')}</div>`:`<div class="pg-btns"><i></i><i></i><i></i></div>`}
+</div></div>`; }
+function olOpen(join){ const el=$('olobby'); el.hidden=false; NET.open=false; if(typeof join==='string'){ NET.view='join'; NET.typed=join; olRender(); netJoin(join); } else { NET.view='menu'; NET.typed=''; olRender(); } }
 function olClose(){ $('olobby').hidden=true; vkClose(); }
+function olSeats(list,total){ return `<div class="pg-seats">${Array.from({length:total},(_,i)=>{ const p=list[i]; return p?`<div class="pg-seat in"><span class="av">${esc(p.nick[0].toUpperCase())}</span><span><b>${esc(p.nick)}${i===0&&NET.role==='host'?' · ты':''}</b><small>«${esc(p.coop)}»</small></span></div>`:`<div class="pg-seat"><span class="av wait"></span><span><b>Свободно</b><small>ждём или сядет бот</small></span></div>`; }).join('')}</div>`; }
 function olRender(err){
-  const el=$('olobby'); if(el.hidden) return; NET.err=err||null; const n=Math.max(+$('np').value,1);
-  let body='';
+  if(NET.open){ mmRender(err); return; }
+  const el=$('olobby'); if(el.hidden) return; NET.err=err||null;
+  const n=+$('np').value||4; let left='', right='';
   if(NET.role==='host'){
-    const list=[{nick:ME.nick,coop:ME.coop,me:true}].concat(NET.people.map(x=>x.pr)); const total=Math.max(n,list.length);
-    body=`<h2>Стол для друзей</h2>
-      <div class="olcode"><small>Код стола</small><b>${NET.ready?NET.code:'····'}</b><button id="olshare" ${NET.ready?'':'disabled'}>Позвать друзей</button></div>
-      <div class="lseats" style="grid-template-columns:repeat(${Math.min(4,total)},1fr)">${Array.from({length:Math.min(4,total)},(_,i)=>{ const p=list[i]; return p?`<div class="lseat in"><span class="av">${esc(p.nick[0].toUpperCase())}</span><b>${esc(p.nick)}</b><small>«${esc(p.coop)}»${p.me?' · ты':''}</small></div>`:`<div class="lseat"><span class="av wait"></span><small>ждём друга<br>или сядет бот</small></div>`; }).join('')}</div>
-      <div class="lfoot"><button id="olcancel">Закрыть стол</button><button class="primary" id="olstart" ${NET.people.length?'':'disabled'}>Начать${NET.people.length?'':' — нужен хотя бы один друг'}</button></div>`;
+    const list=[netProfile()].concat(NET.people.map(x=>x.pr)); const total=Math.max(n,list.length);
+    left=pagerHTML('СТРЕЛКА ЗАБИТА',NET.ready?NET.code:'····',NET.ready?'КОД ДЛЯ СВОИХ':'СВЯЗЬ…');
+    right=`<h2>Стрелка</h2><p class="dim">Скажи код друзьям или отправь им ссылку. Стол на ${n}: кто не приедет, того заменят соперники от игры.</p>${olSeats(list,total)}
+      ${err?`<p class="olerr">${esc(err)}</p>`:''}
+      <div class="ol-actions"><button id="olshare" ${NET.ready?'':'disabled'}>Позвать друзей</button><button class="primary" id="olstart" ${NET.people.length?'':'disabled'}>${NET.people.length?'Начинаем':'Ждём своих…'}</button></div>
+      <button class="linkbtn" id="olcancel">Отменить стрелку</button>`;
   } else if(NET.role==='client'&&NET.conn&&NET.conn.open&&!err){
     const list=NET.people||[];
-    body=`<h2>Стол ${esc(NET.code)}</h2><p class="dim" style="text-align:center;margin:0">Ты за столом. Ждём, пока хозяин начнёт партию.</p>
-      <div class="lseats" style="grid-template-columns:repeat(${Math.max(1,Math.min(4,list.length))},1fr)">${list.map(p=>`<div class="lseat in"><span class="av">${esc(p.nick[0].toUpperCase())}</span><b>${esc(p.nick)}</b><small>«${esc(p.coop)}»${p.nick===ME.nick?' · ты':''}</small></div>`).join('')}</div>
-      <div class="lfoot"><span></span><button id="olcancel">Выйти</button></div>`;
-  } else if(NET.view==='join'||NET.role==='client'){
-    body=`<h2>Войти по коду</h2><p class="dim" style="text-align:center;margin:0">Попроси у хозяина стола четыре цифры.</p>
-      <div class="oljoin"><input id="olcode" maxlength="4" inputmode="numeric" data-vk="num" placeholder="0000" autocomplete="off" value="${esc(NET.code&&NET.role==='client'?NET.code:'')}"><button class="primary" id="olgo">Войти</button></div>
-      ${err?`<p class="olerr">${esc(err)}</p>`:''}
-      <div class="lfoot"><button id="olback">Назад</button><span></span></div>`;
+    left=pagerHTML('ТЫ НА МЕСТЕ',esc(NET.code),'ЖДЁМ ХОЗЯИНА');
+    right=`<h2>Ты на стрелке</h2><p class="dim">Хозяин начнёт партию, когда все подъедут.</p>${olSeats(list,Math.max(list.length,NET.np||list.length))}<button class="linkbtn" id="olcancel">Уехать</button>`;
+  } else if(NET.view==='join'){
+    const t=NET.typed||''; const trying=NET.role==='client'&&!err;
+    left=pagerHTML(trying?'ИЩЕМ СТОЛ…':'НАБЕРИ КОД',(t+'····').slice(0,4),err?'НЕ НАЙДЕН':'',true);
+    right=`<h2>Приехать по коду</h2><p class="dim">Набери на пейджере четыре цифры, которые дал хозяин стола.</p>${err?`<p class="olerr">${esc(err)}</p>`:''}<button class="linkbtn" id="olback">Назад</button>`;
   } else {
-    body=`<h2>Играть с друзьями</h2><p class="dim" style="text-align:center;margin:0">Каждый со своего телефона. Пустые места займут соперники от игры.</p>
-      ${err?`<p class="olerr">${esc(err)}</p>`:''}
-      <div class="olchoice"><button class="primary big" id="olhost">Создать стол</button><button class="big" id="oljoinbtn">Войти по коду</button></div>
-      <div class="lfoot"><button id="olcancel">Закрыть</button><span></span></div>`;
+    left=pagerHTML('НОВОЕ СООБЩЕНИЕ','СТРЕЛКА?','');
+    right=`<h2>Свой стол</h2><p class="dim">Закрытая партия для своих. Друзья садятся по коду, каждый со своего телефона.</p>
+      <div class="ol-choices"><button class="ol-choice primary" id="olhost"><b>Забить стрелку</b><small>создать стол и позвать друзей</small></button><button class="ol-choice" id="oljoinbtn"><b>Приехать по коду</b><small>у друга уже есть стол</small></button></div>
+      <div class="ol-foot"><button class="linkbtn" id="olhot">Играть за одним телефоном</button><button class="linkbtn" id="olcancel">Закрыть</button></div>`;
   }
-  el.innerHTML=`<div class="lobbycard olcard">${body}</div>`;
+  el.innerHTML=`<div class="olwrap"><div class="ol-left">${left}</div><div class="ol-right">${right}</div></div>`;
   const on=(id,f)=>{ const b=$(id); if(b) b.onclick=f; };
-  on('olhost',()=>netHost()); on('oljoinbtn',()=>{ NET.view='join'; olRender(); });
+  on('olhost',()=>pickSize('Стол на сколько человек','Считая тебя. Кого не хватит — посадим соперников от игры.',()=>netHost()));
+  on('oljoinbtn',()=>{ NET.view='join'; NET.typed=''; olRender(); });
   on('olback',()=>{ netClose(); NET.view='menu'; olRender(); });
   on('olcancel',()=>{ netClose(); olClose(); });
-  on('olstart',netStart);
-  on('olgo',()=>{ const v=($('olcode').value||'').replace(/\D/g,''); if(v.length===4) netJoin(v); });
-  const inp=$('olcode'); if(inp) inp.addEventListener('input',()=>{ const v=inp.value.replace(/\D/g,'').slice(0,4); if(inp.value!==v) inp.value=v; if(v.length===4){ vkClose(); netJoin(v); } });
-  on('olshare',()=>{ const url=location.origin+location.pathname+'?room='+NET.code; const text=`Садись за стол в «Кооператив»: код ${NET.code}`;
+  on('olhot',()=>{ olClose(); pickSize('Сколько игроков за телефоном','Телефон передаётся по кругу.',()=>{ buildSeats(); $('hotseat').hidden=false; }); });
+  on('olstart',()=>netStart());
+  el.querySelectorAll('.pg-key').forEach(k=>k.onclick=()=>{ const d=k.dataset.k; let t=NET.typed||'';
+    if(NET.role==='client'&&!NET.err) return;
+    if(d==='del') t=t.slice(0,-1); else if(d==='ok'){ if(t.length===4) netJoin(t); return; } else if(t.length<4) t+=d;
+    NET.typed=t; if(NET.err){ netClose(); NET.err=null; } olRender(); if(t.length===4) netJoin(t); });
+  on('olshare',()=>{ const url=location.origin+location.pathname+'?room='+NET.code; const text=`Забил стрелку в «Кооперативе». Код ${NET.code}`;
     if(navigator.share) navigator.share({title:'Кооператив',text,url}).catch(()=>{});
-    else { try{ navigator.clipboard.writeText(text+' '+url); kAlert('Ссылка скопирована. Отправь её друзьям.',{title:'Готово'}); }catch(e){ kAlert(text+'<br>'+url,{title:'Позови друзей'}); } } });
+    else { try{ navigator.clipboard.writeText(text+' '+url); kAlert('Ссылка скопирована. Отправь её своим.',{title:'Готово'}); }catch(e){ kAlert(text+'<br>'+url,{title:'Позови своих'}); } } });
 }
-
 // ---------- a new enterprise is an event ----------
 function entCelebrate(e){
   const idx=ENT.indexOf(e), nx=nextEnt(ME), total=incomeOf(ME);
