@@ -4,7 +4,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Кооператив">
-<meta name="theme-color" content="#6E0D11">
+<meta name="theme-color" content="#2A0507">
 <link rel="apple-touch-icon" href="apple-icon.png">
 <meta charset="utf-8">
 <title>КООПЕРАТИВ</title>
@@ -14,7 +14,7 @@
 @supports (height:1dvh){:root{--vh:1dvh}}
 @media (max-width:520px) and (orientation:portrait){
   html:not(.norot){--vw:calc(var(--ih,100vh) / 100);--vh:calc(var(--iw,100vw) / 100);--sl:env(safe-area-inset-top,0px);--sr:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-left,0px)}
-  html:not(.norot){height:100%;overflow:hidden}
+  html:not(.norot){height:100%;overflow:hidden;background:#2A0507}
   html:not(.norot) body{touch-action:none;position:fixed;top:0;left:100%;width:var(--ih,100vh);height:var(--iw,100vw);margin:0;transform-origin:0 0;transform:rotate(90deg);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 }
 
@@ -894,9 +894,13 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 </div>
 
 <script>
-(function(){ function vp(){ const d=document.documentElement.style; d.setProperty('--iw',window.innerWidth+'px'); d.setProperty('--ih',window.innerHeight+'px'); }
+(function(){ function vp(){ const d=document.documentElement.style, de=document.documentElement, vv=window.visualViewport;
+    let w=Math.max(innerWidth,de.clientWidth||0), h=Math.max(innerHeight,de.clientHeight||0,vv?Math.round(vv.height):0);
+    const standalone=navigator.standalone||matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches;
+    if(standalone&&screen&&screen.width&&screen.height){ const portrait=h>w; const sw=Math.min(screen.width,screen.height), sh=Math.max(screen.width,screen.height); if(portrait){ w=Math.max(w,sw); h=Math.max(h,sh); } }
+    d.setProperty('--iw',w+'px'); d.setProperty('--ih',h+'px'); }
   let tm=[]; function settle(){ vp(); tm.forEach(clearTimeout); tm=[60,250,600,1200,2000].map(ms=>setTimeout(vp,ms)); }
-  vp(); addEventListener('resize',settle); addEventListener('orientationchange',settle); addEventListener('pageshow',settle); if(window.visualViewport) visualViewport.addEventListener('resize',settle); setTimeout(vp,500); })();
+  vp(); addEventListener('resize',settle); addEventListener('orientationchange',settle); addEventListener('pageshow',settle); addEventListener('load',settle); document.addEventListener('touchstart',settle,{passive:true,once:true}); if(window.visualViewport) visualViewport.addEventListener('resize',settle); setTimeout(vp,500); })();
 // ===================== DATA =====================
 const TYPES = {
   mask:{name:'Обаяние'}, money:{name:'Деньги'}, fist:{name:'Братва'},
