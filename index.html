@@ -1833,7 +1833,7 @@ function ownSpot(){
   const kind=resh?'reshuffle':pending.type; const key='koop.seen.'+kind; let first=false; try{ first=!localStorage.getItem(key); if(first) localStorage.setItem(key,'1'); }catch(e){}
   if(sp.dataset.req!==String(G.turn)+kind) { sp.dataset.req=String(G.turn)+kind; sp.dataset.first=first?'1':''; }
   const rbtn=`<span class="sbtns"><button id="sp_shuf">Перемешать</button><button class="primary" id="sp_done">Готово</button></span>`;
-  const txt=resh?`<b>Перекладываешь</b><p>Нажми две свои карты — они поменяются местами. Или перемешай всё. Это вместо атаки.</p>${rbtn}`:pending.type==='over'?`<b>Лишний щит</b><p>Больше ${G.opts.v2limit} щитов держать нельзя. Нажми щит, который уйдёт в сброс.</p>`:`<b>Отдай щит игроку ${esc(pending.to.name)}</b><p>Нажми свой щит, который отдаёшь${pending.n>1?' (ещё '+pending.n+')':''}.</p>`;
+  const txt=resh?`<b>Перекладываешь</b><p>Нажми на две свои карты — они поменяются местами. Или перемешай всё. Это вместо атаки.</p>${rbtn}`:pending.type==='over'?`<b>Лишний щит</b><p>Больше ${G.opts.v2limit} щитов держать нельзя. Нажми на щит, который уйдёт в сброс.</p>`:`<b>Отдай щит игроку ${esc(pending.to.name)}</b><p>Нажми на свой щит, который отдаёшь${pending.n>1?' (ещё '+pending.n+')':''}.</p>`;
   sp.hidden=false;
   sp.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>${sp.dataset.first?`<div class="tip">${txt}</div>`:`<div class="mini">${resh?rbtn:pending.type==='over'?'Лишний щит — в сброс':'Отдай щит'}</div>`}`;
   const tip=sp.querySelector('.tip,.mini'); if(tip) placeTip(tip,r);
@@ -1877,9 +1877,9 @@ function render(quiet){
             sel.target==null ? 'Теперь кликни позицию на чужом ларьке.' : `Бьёшь по «${G.players[sel.target].stall}», позиция ${sel.slot+1}.`;
       if(pending.p.banTarget!=null&&G.opts.turn==='defender'&&G.opts.ban&&alive(G).length>2) sub+=` Обратный удар по ${G.players[pending.p.banTarget].name} запрещён.`;
       btns=`<button id="shuf" title="Перемешать свои карты на ларьке">Перемешать</button>${pending.superTypes.map(x=>`<button class="${sel.superType===x?'primary':''}" data-super="${x}">⚡ Супер ${ico(x)}</button>`).join('')}<button class="primary" id="fire" ${ready?'':'disabled'}>Бить</button>`; break; }
-    case 'give': t=`Отдай ${pending.n>1?pending.n+' щита':'щит'} игроку ${pending.to.name}`; sub=G.opts.variant==='v2'?'Кликни щит, который отдаёшь. Его место останется пустым до перекладывания.':'Кликни щит на своём ларьке или в руке. Дыра на ларьке закроется щитом из руки или пустышкой.'; break;
+    case 'give': t=`Отдай ${pending.n>1?pending.n+' щита':'щит'} игроку ${pending.to.name}`; sub=G.opts.variant==='v2'?'Нажми на щит, который отдаёшь. Его место останется пустым до перекладывания.':'Нажми на щит в своём ряду или в руке. Дыра на ларьке закроется щитом из руки или пустышкой.'; break;
     case 'blind': t='Там пустышка!'; sub=`Слепо ткни в любую другую закрытую карту у ${pending.target.name}. Что там лежит, то и заберёшь.`; break;
-    case 'over': t='Лишний щит'; sub=`Больше ${G.opts.variant==='v2'?G.opts.v2limit:G.opts.limit} держать нельзя. Кликни щит, который уйдёт в сброс.`; break;
+    case 'over': t='Лишний щит'; sub=`Больше ${G.opts.variant==='v2'?G.opts.v2limit:G.opts.limit} держать нельзя. Нажми на щит, который уйдёт в сброс.`; break;
   }
   const showT = timerShouldRun();
   const pquiet=!G.over&&!paused&&(busy||!pending||pending.p.isBot||(G.online&&pending.p.id!==meId)||pending.type==='over'||pending.type==='give'||pending.type==='attack');
@@ -2832,7 +2832,7 @@ const TOUR=[
   {sel:'#opps',h:'Соперники',p:'Их щиты лежат рубашкой вверх. Цифра на карте — позиция, по ней ты будешь бить. Внизу видно, сколько у кого щитов и карт атак.'},
   {sel:'#mine',h:'Твой ряд',p:'Твои щиты открыты только тебе. Среди них одна пустышка «Ушёл на базу». Порядок карт важен: соперники запоминают, что где вскрылось.'},
   {sel:'#mine .plate:not(.ph)',h:'Плашка щита',p:'Красные значки — атаки, которые пробивают этот щит. Золотой — атака, которую он отражает обратно в атакующего.'},
-  {sel:'#me',h:'Рука',p:'Карты атак. Кликни одну или несколько одного вида — это ставка. В начале хода добираешь одну карту, в руке не больше четырёх.'},
+  {sel:'#me',h:'Рука',p:'Карты атак. Нажми на одну или несколько карт одного вида — это ставка. В начале хода добираешь одну карту, в руке не больше четырёх.'},
   {sel:'#prompt',h:'Подсказка хода',p:'Здесь всегда написано, что делать сейчас. После выбора карт кликни карту соперника и жми «Бить». «Переложить» меняет порядок твоих карт вместо атаки.'},
   {sel:'#legendbtn',h:'Памятка',p:'Если забыл, кто кого пробивает — здесь таблица. Рядом «Журнал» со всеми ходами партии.'},
   {sel:'#pace',h:'Темп',p:'Скорость ботов и анимаций. Галочка «пауза после бота» останавливает игру после каждого чужого хода, пока не нажмёшь «Дальше».'}
