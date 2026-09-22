@@ -1424,7 +1424,7 @@ function renderSim(a,n,opts){
 }
 
 // ===================== UI: GAME =====================
-let G=null, gen=null, pending=null, viewOpen=false, busy=false, sel={card:null,target:null,slot:null,superType:null,swapA:null};
+let G=null, gen=null, pending=null, viewOpen=false, busy=false, sel={card:null,cards:[],target:null,slot:null,superType:null,swapA:null,mode:null,swapsLeft:0};
 const $=id=>document.getElementById(id);
 const fx=$('fx');
 
@@ -1459,7 +1459,7 @@ function startMatch(seats,quick,mo){
   G=newGame(seats.map(x=>({name:x.name,isBot:x.isBot})),opts,100000,true); G.quick=!!quick;
   seats.forEach((x,i)=>{ G.players[i].coop=x.coop||null; G.players[i].persona=x.persona||null; if(x.remote) G.players[i].remote=true; });
   if(mo&&mo.online) G.online=true;
-  const first=(mo&&mo.first)||0; gen=startGame(G,first);
+  const first=(mo&&mo.first)||0; resetSel(); pending=null; gen=startGame(G,first);
   meId=(G.players.find(p=>!p.isBot&&!p.remote)||G.players[0]).id; lastHuman=null; sameTurnHuman=false; viewOpen=false;
   $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
   say(G,'o-sys',`Раздача. Первым ходит ${seats[first].name}.`);
