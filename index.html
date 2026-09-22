@@ -15,6 +15,7 @@
 @media (max-width:520px) and (orientation:portrait){
   html:not(.norot){--vw:calc(var(--ih,100vh) / 100);--vh:calc(var(--iw,100vw) / 100);--sl:env(safe-area-inset-top,0px);--sr:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-left,0px)}
   html:not(.norot){height:100%;overflow:hidden;background:#2A0507}
+  @supports (width:100lvh){ html:not(.norot){--vw:calc(max(var(--ih,100vh), 100lvh) / 100)} html:not(.norot) body{width:max(var(--ih,100vh),100lvh)!important} }
   html:not(.norot) body{touch-action:none;position:fixed;top:0;left:100%;width:var(--ih,100vh);height:var(--iw,100vw);margin:0;transform-origin:0 0;transform:rotate(90deg);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 }
 
@@ -477,7 +478,10 @@ body:not(.dev) #autoplay{display:none}
 .loading .licons span img{width:62%;height:62%;object-fit:contain}
 @keyframes lglow{0%,100%{opacity:.3;filter:grayscale(1);transform:scale(1);border-color:rgba(217,168,104,.25)}12%{opacity:1;filter:none;transform:scale(1.14);border-color:var(--tc);box-shadow:0 0 22px var(--tc)}30%{opacity:.3;filter:grayscale(1);transform:scale(1)}}
 .loading .lplayers{display:flex;gap:clamp(8px,2vw,16px);flex-wrap:wrap;justify-content:center}
-.loading .lplayers div{font-size:12px;color:var(--paper-dim);text-align:center}
+.loading .lplayers div{font-size:12px;color:var(--paper-dim);text-align:center;padding:6px 10px;border-radius:10px;border:2px solid transparent;transition:background .12s,border-color .12s,transform .25s}
+.loading .lplayers div.pick{border-color:var(--brass);background:rgba(217,168,104,.14)}
+.loading .lplayers div.won{background:var(--brass);border-color:var(--brass);transform:scale(1.12)}
+.loading .lplayers div.won b,.loading .lplayers div.won{color:var(--ink)}
 .loading .lplayers b{display:block;font-family:var(--display);font-weight:400;font-size:14px;color:var(--paper)}
 .loading .lsub{font-size:12px;color:var(--paper-dim);letter-spacing:.1em}
 .result{position:fixed;inset:0;z-index:88;background:rgba(10,1,2,0);display:flex;align-items:center;justify-content:center;padding:max(10px,var(--st)) max(16px,var(--sr)) max(10px,var(--sb)) max(16px,var(--sl));transition:background .8s}
@@ -523,6 +527,26 @@ body:not(.dev) #autoplay{display:none}
 .table.myturn #me .hcard{transition:filter .4s}
 .kiosk.cur{animation:curglow 1.8s ease-in-out infinite}
 @keyframes curglow{0%,100%{box-shadow:0 0 0 2px var(--brass),0 0 18px rgba(217,168,104,.25),0 14px 30px rgba(0,0,0,.55)}50%{box-shadow:0 0 0 2px var(--brass),0 0 44px rgba(217,168,104,.6),0 14px 30px rgba(0,0,0,.55)}}
+/* ---------- online lobby ---------- */
+.altplay{display:flex;gap:6px;justify-content:center;align-items:center;color:var(--paper-dim);font-size:12px}
+.olcard h2{text-align:center;margin:0}
+.olcode{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.olcode small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
+.olcode b{font-family:var(--display);font-weight:400;font-size:clamp(34px,11vh,54px);letter-spacing:.18em;color:#FFE2A8;text-shadow:3px 4px 0 #2A0406}
+.olchoice{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.olchoice .big{min-width:200px}
+.oljoin{display:flex;gap:10px;justify-content:center;align-items:center}
+.oljoin input{width:150px;text-align:center;font-family:var(--display);font-size:32px;letter-spacing:.3em;padding:6px 8px;background:rgba(0,0,0,.35);border:1px solid var(--brass);border-radius:10px;color:#FFE2A8}
+.olerr{color:#FF9C8C;text-align:center;margin:0;font-size:13px}
+/* ---------- own-row spotlight (extra / give shield) ---------- */
+.slotpos.incoming{visibility:hidden}
+.ospot{position:fixed;inset:0;z-index:50;pointer-events:none}
+.ospot .spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(12,1,3,.72),0 0 0 2px var(--brass);transition:all .3s}
+.ospot .tip,.ospot .mini{position:fixed;max-width:300px;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:10px 14px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.ospot .tip b{font-family:var(--display);font-weight:400;color:var(--brass);font-size:15px;display:block;margin-bottom:4px}
+.ospot .tip p{margin:0;font-size:13px;line-height:1.4}
+.ospot .mini{white-space:nowrap;padding:6px 12px;font-family:var(--display);font-size:13px;color:var(--brass)}
+#mine{position:relative;z-index:51}
 /* ---------- tutorial pulse on the real targets ---------- */
 .cpulse{animation:cpulse2 1.05s ease-in-out infinite}
 .hcard.cpulse{z-index:40 !important}
@@ -770,7 +794,7 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
           <div class="numpick"><button type="button" data-n="2">2</button><button type="button" data-n="3">3</button><button type="button" data-n="4" class="on">4</button></div>
         </div>
         <button class="primary big" id="findbtn">Найти игру</button>
-        <button class="linkbtn" id="hotseatbtn" type="button">Играть с друзьями за одним телефоном</button>
+        <div class="altplay"><button class="linkbtn" id="onlinebtn" type="button">С друзьями онлайн</button><span>·</span><button class="linkbtn" id="hotseatbtn" type="button">За одним телефоном</button></div>
         <div id="hotseat" hidden><div id="seats" class="seats"></div><button class="primary big" id="start">Раздать</button></div>
       </div>
     </div>
@@ -817,6 +841,7 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 <div id="loading" class="loading" hidden></div>
 <div id="result" class="result" hidden></div>
 <div id="lobby" class="lobby" hidden></div>
+<div id="olobby" class="lobby" hidden></div>
 <div id="pview" class="pview" hidden></div>
 <div id="intro" class="intro" hidden></div>
 <div id="tour" class="tour" hidden></div>
@@ -1429,30 +1454,32 @@ $('gal-atk').innerHTML=ATTACKS.map(a=>`<div class="hcard">${attackFace({type:a[0
 $('legend').innerHTML=legendHTML().replace('id="legendtoggle"','hidden').replace('id="legendbody"','');
 $('gal-legend').innerHTML=legendHTML().replace('id="legendtoggle"','hidden').replace('id="legendbody"','');
 
-function startMatch(seats,quick){
+function startMatch(seats,quick,mo){
   const opts=getOpts(); opts.variant=$('variant').value;
   G=newGame(seats.map(x=>({name:x.name,isBot:x.isBot})),opts,100000,true); G.quick=!!quick;
-  seats.forEach((x,i)=>{ G.players[i].coop=x.coop||null; G.players[i].persona=x.persona||null; });
-  gen=startGame(G,0);
-  meId=(G.players.find(p=>!p.isBot)||G.players[0]).id; lastHuman=null; sameTurnHuman=false; viewOpen=false;
+  seats.forEach((x,i)=>{ G.players[i].coop=x.coop||null; G.players[i].persona=x.persona||null; if(x.remote) G.players[i].remote=true; });
+  if(mo&&mo.online) G.online=true;
+  const first=(mo&&mo.first)||0; gen=startGame(G,first);
+  meId=(G.players.find(p=>!p.isBot&&!p.remote)||G.players[0]).id; lastHuman=null; sameTurnHuman=false; viewOpen=false;
   $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
-  say(G,'o-sys',`Раздача. Первым ходит ${seats[0].name}.`);
+  say(G,'o-sys',`Раздача. Первым ходит ${seats[first].name}.`);
   step(undefined);
 }
 $('start').addEventListener('click',()=>{
   const n=+$('np').value;
   const seats=Array.from({length:n},(_,i)=>({name:$('nm'+i).value||('Игрок '+(i+1)),isBot:$('bt'+i).checked}));
-  startMatch(seats,false);
+  startMatch(seats,false,{first:Math.floor(Math.random()*seats.length)});
 });
-$('newgame').addEventListener('click',()=>{ busy=false; paused=null; fx.innerHTML=''; $('rotatehint').classList.remove('armed'); document.body.classList.remove('ingame'); $('toolbar').classList.remove('open'); $('boardwrap').hidden=true; $('setup').hidden=false; $('drawer').classList.remove('open'); });
+$('newgame').addEventListener('click',()=>{ if(G&&G.online){ netClose(); G.online=false; } busy=false; paused=null; fx.innerHTML=''; $('rotatehint').classList.remove('armed'); document.body.classList.remove('ingame'); $('toolbar').classList.remove('open'); $('boardwrap').hidden=true; $('setup').hidden=false; $('drawer').classList.remove('open'); });
 $('autoplay').addEventListener('click',()=>{ if(busy) return; G.players.forEach(p=>p.isBot=true); viewOpen=true; if(pending) step(botAnswer(G,pending)); });
 function openDrawer(mode){ drawerMode=mode; $('logpane').hidden=mode!=='log'; $('legend').hidden=mode!=='legend'; $('drawertitle').textContent=mode==='log'?'Журнал':'Памятка: кто кого пробивает'; $('drawer').classList.add('open'); }
 $('logbtn').onclick=()=>openDrawer('log'); $('legendbtn').onclick=()=>openDrawer('legend'); $('drawerclose').onclick=()=>$('drawer').classList.remove('open');
 
 function humansCount(){ return G.players.filter(p=>!p.isBot).length; }
-function needCurtain(){ return humansCount()>1; }
+function needCurtain(){ return humansCount()>1&&!G.online; }
 
 async function step(answer){
+  if(NET.role==='client'&&G&&G.online){ if(busy||!pending||pending.p.id!==meId) return; const a=Object.assign({},answer||{}); if(a.reshuffle) a.table=G.players[meId].table.filter(Boolean); netSend(NET.conn,{t:'ans',a}); busy=true; render(); return; }
   if(busy) return;
   let r=gen.next(answer); lastActor=pending?pending.p:null;
   await advance(r);
@@ -1471,17 +1498,18 @@ async function advance(r){
     }
     skipPause=false;
     if(req.p.isBot){
-      if(req.type==='attack'){ pending=req; render(); await sleep(P().think); }
+      if(req.type==='attack'){ pending=req; render(); netSync(); await sleep(P().think); }
       lastActor=req.p; r=gen.next(G.tut?tutBot(req):botAnswer(G,req)); continue;
     }
+    if(G.online&&req.p.remote){ pending=req; viewOpen=true; busy=true; render(); netSync(); const a=await netAwait(req); lastActor=req.p; r=gen.next(a); continue; }
     if(req.type==='rearrange'){ meId=req.p.id; r=gen.next(null); continue; }
     pending=req; resetSel(); meId=req.p.id; hidePeek(true);
     if(req.type==='attack'&&!G.tut){ try{ if(!localStorage.getItem('koop.tourSeen')){ scheduleTour(); } }catch(e){} }
     viewOpen = !needCurtain() || (req.p.id===lastHuman && sameTurnHuman);
-    lastHuman=req.p.id; sameTurnHuman=true; busy=false; render(); return;
+    lastHuman=req.p.id; sameTurnHuman=true; busy=false; render(); netSync(); return;
   }
   if(G.events.length){ await playEvents(); }
-  pending=null; busy=false; render();
+  pending=null; busy=false; render(); netSync();
   if(G.over&&!G.awarded){ G.awarded=true; const a=await awardGame(G); if(a){ G.award=a; render(); } setTimeout(()=>G.tut?showTutResult():showResult(G),900); }
 }
 function resumeFromPause(){ if(!paused) return; const r=paused; paused=null; lastActor=null; advance(r); }
@@ -1554,9 +1582,13 @@ async function revealOverlay(pid,slot,face,outcome){
 }
 let lingerSlot=null;
 function clearLinger(){ hidePeek(true); lingerSlot=null; fx.querySelectorAll('.ovl').forEach(o=>o.remove()); }
+let HIDE={};
 async function playEvents(){
   if(!G||!G.events.length) return;
+  if(typeof netOnEvents==='function') netOnEvents();
   const evs=G.events.splice(0);
+  HIDE={}; for(const e of evs) if(e.kind==='move') HIDE[e.to]=(HIDE[e.to]||0)+1;
+  try{
   for(const e of evs){
     if(document.hidden){ continue; }
     switch(e.kind){
@@ -1576,7 +1608,7 @@ async function playEvents(){
         const toS=stallRect(e.to); if(!from||!toS) break;
         const w=Math.max(60,(e.slot!=null?from.width:from.width*0.44));
         const f=e.slot!=null?{left:from.left,top:from.top,width:from.width,height:from.height}:centerRect(from,w);
-        const el=await fly(shieldFace(e.sid),f,centerRect(toS,w*0.8),700,{fade:true}); el.remove();
+        const el=await fly(shieldFace(e.sid),f,centerRect(toS,w*0.8),700,{fade:true}); el.remove(); if(HIDE[e.to]) HIDE[e.to]--;
         break; }
       case 'discard': { const s=stallRect(e.pid); if(!s) break; const f=centerRect(s,s.width*0.4); const el=await fly(shieldFace(e.sid),f,{left:f.left,top:f.top+120,width:f.width*0.6,height:f.height*0.6},500,{fade:true}); el.remove(); break; }
       case 'fill': break;
@@ -1589,6 +1621,7 @@ async function playEvents(){
     }
     render(true);
   }
+  } finally { HIDE={}; }
 }
 
 // ---------- render ----------
@@ -1598,10 +1631,11 @@ function kioskHTML(p,own,openCards,ctx){
   const canTarget=pickingTarget&&pending.targets.some(q=>q.id===p.id);
   const v2=G.opts.variant==='v2';
   const nS=p.table.length;
+  const hideN=HIDE[p.id]||0; const liveIdx=p.table.map((s,i)=>s?i:-1).filter(i=>i>=0); const hideSet=new Set(hideN?liveIdx.slice(-hideN):[]);
   const slots=p.table.map((s,i)=>{
     const k=i-(nS-1)/2; const fanStyle=`style="--rot:${(k*(own?4:6)).toFixed(1)}deg;--dy:${(Math.abs(k)*(own?3:4)).toFixed(0)}px;--z:${i+1}"`;
     if(!s) return `<div class="slotpos gap" ${fanStyle}><div class="cardbox"><span>пусто</span></div></div>`;
-    let cls='slotpos', up=openCards;
+    let cls='slotpos'+(hideSet.has(i)?' incoming':''), up=openCards;
     const ling = lingerSlot && lingerSlot.pid===p.id && lingerSlot.slot===i;
     if(ling){ up=true; cls+=' linger'; }
     const lingMark = ling ? `<span class="lingbadge ${lingerSlot.outcome}">${outcomeLabel(lingerSlot.outcome)}</span>` : '';
@@ -1620,8 +1654,22 @@ function kioskHTML(p,own,openCards,ctx){
   return `<div class="kiosk ${own?'own':''} ${turnNow?'cur':''} ${sel.target===p.id?'target':''} ${p.alive?'':'dead'} ${canTarget?'pick':''}" data-p="${p.id}">
     <div class="phead"><b>${p.name}</b>${(own&&isMe&&pending&&pending.type==='attack'&&!pending.p.isBot&&G.opts.variant==='v2'&&sel.mode!=='reshuffle'&&viewOpen&&!busy)?'<button class="reshuf-mini" id="reshuf" title="Вместо атаки переложить свои карты">Переложить</button>':`<span class="who">${p.coop?('«'+p.coop+'»'):(p.isBot?'бот':'человек')}${p.alive?'':' · выбыл'}</span>`}</div>
     <div class="window ${(canTarget||(pickingBlind&&pending.target.id===p.id)||(pickingOwn&&isMe))?'picking':''}">${slots}</div>
-    <div class="counter"><span>щитов <b>${realCount(p)}</b></span>${v2?'':`<span>в руке <b>${p.hand.length}</b></span>`}<span>атак <b>${p.atk.length}</b></span></div>
+    <div class="counter"><span>щитов <b>${realCount(p)-hideN}</b></span>${v2?'':`<span>в руке <b>${p.hand.length}</b></span>`}<span>атак <b>${p.atk.length}</b></span></div>
   </div>`;
+}
+function ownSpot(){
+  let sp=$('ospot'); const need=G&&!G.over&&!G.tut&&pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&(pending.type==='over'||pending.type==='give');
+  if(!need){ if(sp) sp.hidden=true; document.querySelectorAll('#mine .cpulse').forEach(x=>x.classList.remove('cpulse')); return; }
+  if(!sp){ sp=document.createElement('div'); sp.id='ospot'; sp.className='ospot'; document.body.appendChild(sp); }
+  const win=document.querySelector('#mine .window'); if(!win) return;
+  const r=L(win.getBoundingClientRect()), pad=6;
+  const key='koop.seen.'+pending.type; let first=false; try{ first=!localStorage.getItem(key); if(first) localStorage.setItem(key,'1'); }catch(e){}
+  if(sp.dataset.req!==String(G.turn)+pending.type) { sp.dataset.req=String(G.turn)+pending.type; sp.dataset.first=first?'1':''; }
+  const txt=pending.type==='over'?`<b>Лишний щит</b><p>Больше ${G.opts.v2limit} щитов держать нельзя. Нажми щит, который уйдёт в сброс.</p>`:`<b>Отдай щит → ${esc(pending.to.name)}</b><p>Нажми свой щит, который отдаёшь${pending.n>1?' (ещё '+pending.n+')':''}.</p>`;
+  sp.hidden=false;
+  sp.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>${sp.dataset.first?`<div class="tip">${txt}</div>`:`<div class="mini">${pending.type==='over'?'Лишний щит — в сброс':'Отдай щит'}</div>`}`;
+  const tip=sp.querySelector('.tip,.mini'); if(tip) placeTip(tip,r);
+  document.querySelectorAll('#mine .slotpos').forEach(x=>{ const i=+x.dataset.i; const me=G.players[meId]; if(me.table[i]&&me.table[i].kind==='shield'){ x.style.setProperty('--pc','#D9A868'); x.classList.add('cpulse'); } });
 }
 function render(quiet){
   if(!G) return;
@@ -1642,7 +1690,7 @@ function render(quiet){
   if(G.over){ t=G.winner?`🏆 Победа: ${G.winner.name}`:'Партия окончена'; sub=(G.winner?`Бизнес устоял, остальные разорены. `:'')+(G.award?`+${G.award.v} ваучеров · +${fmt(G.award.k)} копеек`:''); btns=`<button id="again" class="primary">Ещё партию</button>`; }
   else if(paused){ const l=G.log[G.log.length-1]; t=`${lastActor?lastActor.name:'Бот'} сходил`; sub=l?l.txt:''; btns=`<button class="primary" id="next">Дальше</button>`; calm=true; }
   else if(busy||!pending){ t='…'; calm=true; }
-  else if(pending.p.isBot){ t=`Ход: ${pending.p.name}`; sub='думает, кого и чем бить…'; calm=true; }
+  else if(pending.p.isBot||(G.online&&pending.p.id!==meId)){ t=`Ход: ${pending.p.name}`; sub='думает, кого и чем бить…'; calm=true; }
   else if(!viewOpen){ t=`Ход: ${pending.p.name}`; sub='экран передаётся'; calm=true; }
   else switch(pending.type){
     case 'attack': if(G.opts.variant==='v2'){
@@ -1665,9 +1713,9 @@ function render(quiet){
     case 'over': t='Лишний щит'; sub=`Больше ${G.opts.variant==='v2'?G.opts.v2limit:G.opts.limit} держать нельзя. Кликни щит, который уйдёт в сброс.`; break;
   }
   const showT = timerShouldRun();
-  const pquiet=!G.over&&!paused&&(busy||!pending||pending.p.isBot||(!viewOpen&&false)||(pending.type==='attack'&&sel.mode!=='reshuffle'));
+  const pquiet=!G.over&&!paused&&(busy||!pending||pending.p.isBot||(G.online&&pending.p.id!==meId)||pending.type==='over'||pending.type==='give'||(pending.type==='attack'&&sel.mode!=='reshuffle'));
   pr.className='prompt'+(calm?' calm':'')+(pquiet?' quiet':'');
-  $('table').classList.toggle('myturn',!!(pending&&!pending.p.isBot&&viewOpen&&!busy&&!G.over)); pr.innerHTML=`<span class="msg"><span class="t">${t}</span><span class="s">${sub}</span></span><span class="row">${btns}${showT?'<span class="tnum"></span>':''}</span>`;
+  $('table').classList.toggle('myturn',!!(pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&!G.over)); pr.innerHTML=`<span class="msg"><span class="t">${t}</span><span class="s">${sub}</span></span><span class="row">${btns}${showT?'<span class="tnum"></span>':''}</span>`;
   if(showT){ if(!tTick||!pendingTimed||pendingTimed!==pending) { pendingTimed=pending; startTimer(); } else tickTimer(); } else { stopTimer(); pendingTimed=null; }
   const dn=$('done'); if(dn) dn.onclick=()=>step(null);
   const sh=$('shuf'); if(sh) sh.onclick=()=>{ shuffle(me.table); sel.swapA=null; render(); };
@@ -1724,7 +1772,7 @@ function render(quiet){
   meBox.querySelectorAll('[data-h]').forEach(el=>el.onclick=()=>{ if(!showOwn) return; const i=+el.dataset.h;
     if(pending.type==='give'||pending.type==='over') step({from:'hand',idx:i});
     else if(pending.type==='attack'){ if(sel.swapA==null) sel.swapA={from:'hand',idx:i}; else { swapRefs(me,sel.swapA,{from:'hand',idx:i}); sel.swapA=null; } render(); } });
-  renderLog();
+  renderLog(); ownSpot();
 }
 function renderLog(){ const lg=$('log'); lg.innerHTML=G.log.slice().reverse().map(l=>`<div class="${l.cls}"><span class="dim">${l.turn}.</span> ${l.txt}</div>`).join(''); }
 function swapRefs(p,a,b){
@@ -1805,8 +1853,8 @@ function rewardFor(G,pid,income){
 }
 async function awardGame(G){
   if(!ME||!G.quick) return null;
-  const p0=G.players[0]; if(p0.isBot) return null;
-  const r=rewardFor(G,0,incomeOf(ME));
+  const p0=G.players[meId]; if(!p0||p0.isBot) return null;
+  const r=rewardFor(G,meId,incomeOf(ME));
   ME.v+=r.v; ME.k+=r.k; ME.games++; if(r.won) ME.wins++; ME.pierces+=(p0.pierces||0); saveMe(); updateMeChip();
   return r;
 }
@@ -1932,6 +1980,7 @@ function openPerson(p){
   pv.onclick=e=>{ if(e.target===pv) pvShut(); };
   const fb=$('followbtn'); if(fb) fb.onclick=()=>{ if(!ME) return; const i=ME.follows.indexOf(p.nick); if(i>=0) ME.follows.splice(i,1); else ME.follows.push(p.nick); saveMe(); openPerson(p); };
 }
+$('onlinebtn').onclick=()=>{ if(!ME){ showReg(); return; } NET.view='menu'; olOpen(); };
 $('empirebtn').onclick=()=>goPage('empire'); $('shopbtn').onclick=()=>goPage('shop');
 
 // ===================== FORCED TUTORIAL MATCH =====================
@@ -1946,7 +1995,7 @@ function tutIntro(repeat){
     <p>${repeat?'Короткая партия с Михалычем, с подсказками на каждом ходу.':'Сыграй одну короткую партию с Михалычем. Я подскажу каждый ход. Выиграешь — получишь ваучеры, копейки и свою первую палатку.'}</p>
     <button class="primary big" id="tutgo">К столу</button></div>`;
   $('tutgo').onclick=()=>{ r.hidden=true; const pp=personaFor(TUT_OPP); if(pp.coop===ME.coop) pp.coop=COOPS.find(x=>x!==ME.coop);
-    showLoading([{name:ME.nick,coop:ME.coop,isBot:false},{name:TUT_OPP,coop:pp.coop,isBot:true,persona:pp}],false,seats=>startTutorial(seats,repeat)); };
+    showLoading([{name:ME.nick,coop:ME.coop,isBot:false},{name:TUT_OPP,coop:pp.coop,isBot:true,persona:pp}],false,seats=>startTutorial(seats,repeat),0,true); };
 }
 function startTutorial(seats,repeat){
   const opts=getOpts(); opts.variant='v2'; opts.v2limit=9; opts.v2dummy='miss'; opts.v2hand=4; opts.v2draw='one';
@@ -2106,15 +2155,22 @@ function postTutTick(){
 function tutResume(){ if(!ME||ME.tut===undefined||ME.tut===true) return false; if(ME.tut==='reward'){ postTutStart(); return true; } tutIntro(); return true; }
 
 // ---------- loading between lobby and deal ----------
-function showLoading(seats,quick,starter){
-  const el=$('loading'); el.hidden=false;
+function showLoading(seats,quick,starter,first,noDraw){
+  const el=$('loading'); el.hidden=false; const n=seats.length;
+  if(first==null) first=Math.floor(Math.random()*n);
   el.innerHTML=`<div class="ltitle">Стол собран</div>
     <div class="licons">${TYPE_IDS.map((t,i)=>`<span style="--tc:${TCOLOR[t]};animation-delay:${(i*0.3).toFixed(2)}s"><img src="${IMG.icon(t)}" alt=""></span>`).join('')}</div>
     <div class="lplayers">${seats.map(x=>`<div><b>${esc(x.name)}</b>${x.coop?'«'+esc(x.coop)+'»':''}</div>`).join('')}</div>
-    <div class="lsub">РАЗДАЁМ КАРТЫ…</div>`;
+    <div class="lsub">${noDraw||n<2?'РАЗДАЁМ КАРТЫ…':'ТЯНЕМ ЖРЕБИЙ: КТО НАЧИНАЕТ…'}</div>`;
   void el.offsetWidth; el.classList.add('on');
   if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.06,900);
-  setTimeout(()=>{ (starter||startMatch)(seats,quick); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; if(G&&!G.over) render(true); if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.2,2500); },380); },3200);
+  let finish=3200;
+  if(!noDraw&&n>1){
+    const names=el.querySelectorAll('.lplayers>div'); const total=2*n+first; let t=700;
+    for(let k=0;k<=total;k++){ t+=70+Math.pow(k/total,2.4)*300; const kk=k; setTimeout(()=>{ names.forEach((x,j)=>x.classList.toggle('pick',j===kk%n)); if(kk===total){ names[first].classList.add('won'); el.querySelector('.lsub').textContent='Первым ходит '+seats[first].name; } },t); }
+    finish=Math.max(3200,t+1300);
+  }
+  setTimeout(()=>{ (starter||((ss,q)=>startMatch(ss,q,{first})))(seats,quick,first); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; if(G&&!G.over) render(true); if(typeof musicOn!=='undefined'&&musicOn&&!bgm.paused) fadeTo(.2,2500); },380); },finish);
 }
 // ---------- end of match ----------
 function playAgain(){ const q=G&&G.quick; $('result').hidden=true; $('result').classList.remove('on'); $('newgame').click(); if(q) openLobby(); }
@@ -2170,7 +2226,7 @@ function runSplash(done){
   let fin=false; const end=()=>{ if(fin) return; fin=true; sp.classList.add('out'); setTimeout(()=>{ sp.remove(); done(); },450); };
   const t=setTimeout(end,2700); sp.onclick=()=>{ clearTimeout(t); end(); };
 }
-runSplash(()=>{ if(!ME) showReg(); else if(!tutResume()) { try{ if(!localStorage.getItem('koop.introSeen')) showIntro(); }catch(e){} } });
+runSplash(()=>{ const room=(new URLSearchParams(location.search).get('room')||'').replace(/\D/g,'').slice(0,4); if(room.length===4&&ME){ history.replaceState(null,'',location.pathname); olOpen(room); return; } if(!ME) showReg(); else if(!tutResume()) { try{ if(!localStorage.getItem('koop.introSeen')) showIntro(); }catch(e){} } });
 
 // ===================== MUSIC =====================
 const bgm=$('bgm'); bgm.volume=0;
@@ -2200,7 +2256,7 @@ function vkTarget(t){ return t&&t.tagName==='INPUT'&&(!t.type||t.type==='text'||
 function vkFields(inp){ const root=inp.closest('.regcard,.seats,#setup,.page')||document.body; return [...root.querySelectorAll('input')].filter(vkTarget).filter(x=>x.offsetParent); }
 function vkOpen(inp){
   if(vk.inp&&vk.inp!==inp) vk.inp.classList.remove('vkfocus');
-  vk.inp=inp; inp.classList.add('vkfocus'); vk.shift=!inp.value; if(vk.mode==='num') vk.mode=vk.lang;
+  vk.inp=inp; inp.classList.add('vkfocus'); vk.shift=!inp.value; if(inp.dataset.vk==='num') vk.mode='num'; else if(vk.mode==='num') vk.mode=vk.lang;
   if(!vk.el){ vk.el=document.createElement('div'); vk.el.className='vk'; document.body.appendChild(vk.el);
     vk.el.addEventListener('click',e=>{ e.stopPropagation(); const b=e.target.closest('button'); if(b) vkKey(b.dataset.k); }); }
   vkRender(); void vk.el.offsetWidth; vk.el.classList.add('on'); setTimeout(vkReveal,240);
@@ -2239,6 +2295,168 @@ document.addEventListener('pointerdown',e=>{
   if(vk.inp&&!e.target.closest('.vk')&&!e.target.closest('.sugg')) vkClose();
 },true);
 document.addEventListener('focusin',e=>{ const t=vkTarget(e.target); if(t&&isRot()){ t.blur(); } });
+// ===================== ONLINE: host's phone runs the game, friends connect directly (WebRTC via PeerJS) =====================
+const NET={role:null,peer:null,conn:null,code:null,people:[],seatConn:{},waiters:{},queue:Promise.resolve(),pseq:0,lastSeq:-1,awarded:false,starting:false};
+const NET_BASE='kooperativ/r2/';
+const NET_BROKERS=['wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081/mqtt','wss://broker.emqx.io:8084/mqtt'];
+function netLib(){ return window.mqtt?Promise.resolve():new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js'; s.onload=res; s.onerror=()=>rej(new Error('lib')); document.head.appendChild(s); }); }
+addEventListener('pagehide',()=>{ if(NET.role) netClose(); });
+function netRid(){ return Math.random().toString(36).slice(2,10); }
+function netConnect(url,will){ return new Promise(res=>{ const c=mqtt.connect(url,{connectTimeout:7000,reconnectPeriod:2000,keepalive:15,clean:true,clientId:'koop_'+netRid(),will}); let done=false; const fin=v=>{ if(done) return; done=true; clearTimeout(t); res(v); }; const t=setTimeout(()=>{ c.end(true); fin(null); },8000); c.once('connect',()=>fin(c)); c.once('error',()=>{ c.end(true); fin(null); }); }); }
+function netPub(topic,m){ try{ NET.mq&&NET.mq.publish(topic,JSON.stringify(m),{qos:1}); }catch(e){} }
+function netProfile(){ return {nick:ME.nick,coop:ME.coop,ent:ME.ent.slice(),items:ME.items.slice(),games:ME.games,wins:ME.wins}; }
+function netPersona(pr){ return {id:'p_'+pr.nick,nick:pr.nick,coop:pr.coop,ent:pr.ent||[],items:pr.items||[],games:pr.games||0,wins:pr.wins||0,bot:false}; }
+function netSnap(){ const g=Object.assign({},G); g.log=G.log.slice(-40); g.events=[]; return JSON.parse(JSON.stringify(g)); }
+function netPend(req){ if(!req) return null; return {seq:NET.pseq,type:req.type,pid:req.p.id,targets:(req.targets||[]).map(q=>q.id),to:req.to?req.to.id:null,n:req.n||0,v2:!!req.v2,options:req.options||null,target:req.target?req.target.id:null}; }
+function netUnpend(o){ if(!o) return null; return {type:o.type,p:G.players[o.pid],targets:(o.targets||[]).map(i=>G.players[i]),to:o.to!=null?G.players[o.to]:null,n:o.n,v2:o.v2,superTypes:[],options:o.options,target:o.target!=null?G.players[o.target]:null}; }
+function netSend(c,m){ try{ if(c&&c.open) c.send(m); }catch(e){} }
+function netBroadcast(m){ Object.values(NET.seatConn).forEach(c=>netSend(c,m)); }
+function netIsHost(){ return NET.role==='host'&&G&&G.online; }
+function netSync(){ if(!netIsHost()) return; NET.pseq++; netBroadcast({t:'st',G:netSnap(),pend:netPend(pending)}); }
+function netOnEvents(){ if(netIsHost()&&G.events.length) netBroadcast({t:'ev',evs:G.events.slice(),G:netSnap()}); }
+function netAwait(req){
+  const pid=req.p.id;
+  return new Promise(res=>{
+    const lim=((tLimit()||90)+10)*1000;
+    const fallback=()=>{ delete NET.waiters[pid]; res(req.type==='attack'&&req.v2?{pass:true}:botAnswer(G,req)); };
+    const t=setTimeout(fallback,lim);
+    NET.waiters[pid]=a=>{ clearTimeout(t); delete NET.waiters[pid]; res(a); };
+    NET.waiters[pid].drop=()=>{ clearTimeout(t); req.p.isBot=true; req.p.remote=false; delete NET.waiters[pid]; res(botAnswer(G,req)); };
+  });
+}
+function netApplyAnswer(pid,a){
+  if(a&&a.reshuffle&&Array.isArray(a.table)){ const cur=G.players[pid].table.filter(Boolean); const key=x=>x.kind==='dummy'?'dummy':x.sid; const A=cur.map(key).sort().join(), B=a.table.filter(Boolean).map(key).sort().join(); if(A===B) G.players[pid].table=a.table.filter(Boolean).map(x=>x.kind==='dummy'?{kind:'dummy'}:{kind:'shield',sid:x.sid}); delete a.table; }
+  return a;
+}
+// ---------- host ----------
+async function netHost(){
+  netClose(); NET.role='host'; NET.people=[]; NET.seatConn={}; NET.ready=false; olRender();
+  try{ await netLib(); }catch(e){ olRender('Не загрузилась сетевая часть. Проверь интернет.'); return; }
+  NET.code=String(1000+Math.floor(Math.random()*9000)); const root=NET_BASE+NET.code;
+  let mq=null; for(let b=0;b<NET_BROKERS.length&&!mq;b++){ mq=await netConnect(NET_BROKERS[b],{topic:root+'/all',payload:JSON.stringify({t:'hostgone'}),qos:1}); if(mq) NET.broker=b; }
+  if(NET.role!=='host'){ mq&&mq.end(true); return; }
+  if(!mq){ olRender('Нет связи с сервером. Проверь интернет и попробуй ещё раз.'); return; }
+  NET.mq=mq; NET.root=root; NET.conns={};
+  mq.subscribe(root+'/h',{qos:1}); mq.on('connect',()=>mq.subscribe(root+'/h',{qos:1}));
+  mq.on('message',(topic,buf)=>{ let m; try{ m=JSON.parse(buf.toString()); }catch(e){ return; } if(!m||!m.cid) return;
+    let c=NET.conns[m.cid];
+    if(!c){ if(m.t!=='hello') return; c=NET.conns[m.cid]={cid:m.cid,open:true,send:x=>netPub(root+'/c/'+m.cid,x),close(){ this.open=false; netPub(root+'/c/'+m.cid,{t:'kick'}); }}; }
+    if(m.t==='bye'){ c.open=false; delete NET.conns[m.cid]; netHostLost(c); return; }
+    netHostData(c,m); });
+  NET.ready=true; olRender();
+}
+function netHostData(conn,m){
+  if(!m||!m.t) return;
+  if(m.t==='hello'){
+    if(G&&G.online){ netSend(conn,{t:'busy'}); conn.open=false; delete NET.conns[conn.cid]; return; }
+    if(NET.people.length>=3){ netSend(conn,{t:'full'}); conn.open=false; delete NET.conns[conn.cid]; return; }
+    NET.people=NET.people.filter(x=>x.conn!==conn); NET.people.push({conn,pr:m.pr}); olRender(); netLobbyCast(); return; }
+  if(m.t==='ans'){ const pid=Object.keys(NET.seatConn).find(k=>NET.seatConn[k]===conn); if(pid==null) return; const w=NET.waiters[pid]; if(w) w(netApplyAnswer(+pid,m.a||{})); }
+}
+function netHostLost(conn){
+  if(G&&G.online){ const pid=Object.keys(NET.seatConn).find(k=>NET.seatConn[k]===conn); if(pid==null) return; delete NET.seatConn[pid];
+    const p=G.players[pid]; p.remote=false; p.isBot=true; say(G,'o-sys',`${p.name} отключился, за него доиграет бот.`); const w=NET.waiters[pid]; if(w&&w.drop) w.drop(); render(); return; }
+  NET.people=NET.people.filter(x=>x.conn!==conn); olRender(); netLobbyCast();
+}
+function netLobbyCast(){ const list=[netProfile()].concat(NET.people.map(x=>x.pr)); NET.people.forEach(x=>netSend(x.conn,{t:'lobby',people:list,np:Math.max(+$('np').value,list.length)})); }
+function netStart(){
+  if(!NET.people.length) return;
+  const humans=[{name:ME.nick,coop:ME.coop,isBot:false}].concat(NET.people.map(x=>({name:x.pr.nick,coop:x.pr.coop,isBot:false,remote:true,persona:netPersona(x.pr),conn:x.conn})));
+  const n=Math.max(+$('np').value,humans.length); const bots=pickPeople(n-humans.length).filter(b=>!humans.some(h=>h.name===b.nick)).map(p=>({name:p.nick,isBot:true,coop:p.coop,persona:p}));
+  const seats=humans.concat(bots).slice(0,4);
+  NET.seatConn={}; seats.forEach((s,i)=>{ if(s.conn) NET.seatConn[i]=s.conn; });
+  const pub=seats.map(s=>({name:s.name,coop:s.coop}));
+  const first=Math.floor(Math.random()*seats.length);
+  Object.entries(NET.seatConn).forEach(([i,c])=>netSend(c,{t:'loading',seats:pub,seat:+i,first}));
+  olClose(); NET.starting=true;
+  showLoading(seats.map(s=>({name:s.name,coop:s.coop,isBot:s.isBot,remote:!!s.remote,persona:s.persona})),true,(ss,q,f)=>{ NET.starting=false; startMatch(ss,true,{online:true,first:f}); },first);
+}
+// ---------- client ----------
+async function netJoin(code){
+  netClose(); NET.role='client'; NET.code=code; NET.lastSeq=-1; NET.awarded=false; NET.seat=null;
+  olRender('Подключаемся к столу '+code+'…');
+  try{ await netLib(); }catch(e){ olRender('Не загрузилась сетевая часть. Проверь интернет.'); return; }
+  const cid=netRid(), root=NET_BASE+code;
+  for(let b=0;b<NET_BROKERS.length;b++){
+    if(NET.role!=='client'||NET.code!==code) return;
+    const mq=await netConnect(NET_BROKERS[b],{topic:root+'/h',payload:JSON.stringify({t:'bye',cid}),qos:1}); if(!mq) continue;
+    const answered=await new Promise(res=>{
+      NET.mq=mq; NET.root=root;
+      const conn={open:false,send:x=>netPub(root+'/h',Object.assign({},x,{cid})),close(){ netPub(root+'/h',{t:'bye',cid}); this.open=false; }};
+      NET.conn=conn;
+      mq.subscribe([root+'/c/'+cid,root+'/all'],{qos:1},()=>conn.send({t:'hello',pr:netProfile()})); mq.on('connect',()=>mq.subscribe([root+'/c/'+cid,root+'/all'],{qos:1}));
+      const t=setTimeout(()=>res(false),6000);
+      mq.on('message',(topic,buf)=>{ let m; try{ m=JSON.parse(buf.toString()); }catch(e){ return; }
+        if(m.t==='hostgone'||m.t==='kick'){ netClientLost(); return; }
+        if(!conn.open){ conn.open=true; clearTimeout(t); res(true); }
+        NET.queue=NET.queue.then(()=>netClientData(m)).catch(()=>{}); });
+    });
+    if(answered){ olRender(); return; }
+    try{ mq.end(true); }catch(e){} NET.mq=null; NET.conn=null;
+  }
+  if(NET.role==='client'&&NET.code===code) olRender('Стола с кодом '+code+' не нашлось. Проверь цифры или попроси хозяина создать стол заново.');
+}
+function netClientLost(){ if(NET.role!=='client') return; const inGame=G&&G.online&&!G.over; NET.role=null; if(inGame){ $('newgame').click(); kAlert('Связь с хозяином стола пропала. Партия прервана.',{title:'Нет связи'}); } else if(!$('olobby').hidden){ olRender('Хозяин закрыл стол.'); } }
+async function netClientData(m){
+  if(!m||!m.t) return;
+  if(m.t==='lobby'){ NET.people=m.people; NET.np=m.np; olRender(); return; }
+  if(m.t==='full'){ olRender('За этим столом уже нет мест.'); return; }
+  if(m.t==='busy'){ olRender('За этим столом уже идёт партия.'); return; }
+  if(m.t==='loading'){ NET.seat=m.seat; olClose(); showLoading(m.seats,false,()=>{},m.first); return; }
+  if(m.t==='st'||m.t==='ev'){
+    const first=!G||!G.online||$('boardwrap').hidden;
+    G=m.G; G.online=true; G.events=[];
+    if(first){ meId=NET.seat!=null?NET.seat:meId; gen=null; lastHuman=null; viewOpen=true; resetSel(); $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame'); }
+    viewOpen=true;
+    if(m.t==='ev'){ if(pending) pending=netUnpend(netPend(pending)); busy=true; G.events=m.evs; await playEvents(); await sleep(P().after); busy=false; render(); return; }
+    const np=netUnpend(m.pend); const seq=m.pend?m.pend.seq:-1;
+    if(np&&np.p.id===meId&&seq!==NET.lastSeq){ resetSel(); hidePeek(true); }
+    NET.lastSeq=seq; pending=np; busy=false; render();
+    if(G.over&&!NET.awarded){ NET.awarded=true; const a=await awardGame(G); if(a){ G.award=a; render(); } setTimeout(()=>showResult(G),900); }
+    return; }
+}
+function netClose(){ try{ if(NET.role==='host'&&NET.root) netPub(NET.root+'/all',{t:'hostgone'}); if(NET.conn) NET.conn.close(); }catch(e){} const mq=NET.mq; NET.mq=null; if(mq) setTimeout(()=>{ try{ mq.end(); }catch(e){} },300); NET.conn=null; NET.ready=false; NET.people=[]; NET.seatConn={}; NET.waiters={}; NET.role=null; }
+// ---------- lobby screen ----------
+function olOpen(join){ const el=$('olobby'); el.hidden=false; NET.view=join?'join':'menu'; olRender(); if(join&&typeof join==='string'){ NET.view='join'; olRender(); $('olcode').value=join; netJoin(join); } }
+function olClose(){ $('olobby').hidden=true; vkClose(); }
+function olRender(err){
+  const el=$('olobby'); if(el.hidden) return; NET.err=err||null; const n=Math.max(+$('np').value,1);
+  let body='';
+  if(NET.role==='host'){
+    const list=[{nick:ME.nick,coop:ME.coop,me:true}].concat(NET.people.map(x=>x.pr)); const total=Math.max(n,list.length);
+    body=`<h2>Стол для друзей</h2>
+      <div class="olcode"><small>Код стола</small><b>${NET.ready?NET.code:'····'}</b><button id="olshare" ${NET.ready?'':'disabled'}>Позвать друзей</button></div>
+      <div class="lseats" style="grid-template-columns:repeat(${Math.min(4,total)},1fr)">${Array.from({length:Math.min(4,total)},(_,i)=>{ const p=list[i]; return p?`<div class="lseat in"><span class="av">${esc(p.nick[0].toUpperCase())}</span><b>${esc(p.nick)}</b><small>«${esc(p.coop)}»${p.me?' · ты':''}</small></div>`:`<div class="lseat"><span class="av wait"></span><small>ждём друга<br>или сядет бот</small></div>`; }).join('')}</div>
+      <div class="lfoot"><button id="olcancel">Закрыть стол</button><button class="primary" id="olstart" ${NET.people.length?'':'disabled'}>Начать${NET.people.length?'':' — нужен хотя бы один друг'}</button></div>`;
+  } else if(NET.role==='client'&&NET.conn&&NET.conn.open&&!err){
+    const list=NET.people||[];
+    body=`<h2>Стол ${esc(NET.code)}</h2><p class="dim" style="text-align:center;margin:0">Ты за столом. Ждём, пока хозяин начнёт партию.</p>
+      <div class="lseats" style="grid-template-columns:repeat(${Math.max(1,Math.min(4,list.length))},1fr)">${list.map(p=>`<div class="lseat in"><span class="av">${esc(p.nick[0].toUpperCase())}</span><b>${esc(p.nick)}</b><small>«${esc(p.coop)}»${p.nick===ME.nick?' · ты':''}</small></div>`).join('')}</div>
+      <div class="lfoot"><span></span><button id="olcancel">Выйти</button></div>`;
+  } else if(NET.view==='join'||NET.role==='client'){
+    body=`<h2>Войти по коду</h2><p class="dim" style="text-align:center;margin:0">Попроси у хозяина стола четыре цифры.</p>
+      <div class="oljoin"><input id="olcode" maxlength="4" inputmode="numeric" data-vk="num" placeholder="0000" autocomplete="off" value="${esc(NET.code&&NET.role==='client'?NET.code:'')}"><button class="primary" id="olgo">Войти</button></div>
+      ${err?`<p class="olerr">${esc(err)}</p>`:''}
+      <div class="lfoot"><button id="olback">Назад</button><span></span></div>`;
+  } else {
+    body=`<h2>Играть с друзьями</h2><p class="dim" style="text-align:center;margin:0">Каждый со своего телефона. Пустые места займут соперники от игры.</p>
+      ${err?`<p class="olerr">${esc(err)}</p>`:''}
+      <div class="olchoice"><button class="primary big" id="olhost">Создать стол</button><button class="big" id="oljoinbtn">Войти по коду</button></div>
+      <div class="lfoot"><button id="olcancel">Закрыть</button><span></span></div>`;
+  }
+  el.innerHTML=`<div class="lobbycard olcard">${body}</div>`;
+  const on=(id,f)=>{ const b=$(id); if(b) b.onclick=f; };
+  on('olhost',()=>netHost()); on('oljoinbtn',()=>{ NET.view='join'; olRender(); });
+  on('olback',()=>{ netClose(); NET.view='menu'; olRender(); });
+  on('olcancel',()=>{ netClose(); olClose(); });
+  on('olstart',netStart);
+  on('olgo',()=>{ const v=($('olcode').value||'').replace(/\D/g,''); if(v.length===4) netJoin(v); });
+  const inp=$('olcode'); if(inp) inp.addEventListener('input',()=>{ const v=inp.value.replace(/\D/g,'').slice(0,4); if(inp.value!==v) inp.value=v; if(v.length===4){ vkClose(); netJoin(v); } });
+  on('olshare',()=>{ const url=location.origin+location.pathname+'?room='+NET.code; const text=`Садись за стол в «Кооператив»: код ${NET.code}`;
+    if(navigator.share) navigator.share({title:'Кооператив',text,url}).catch(()=>{});
+    else { try{ navigator.clipboard.writeText(text+' '+url); kAlert('Ссылка скопирована. Отправь её друзьям.',{title:'Готово'}); }catch(e){ kAlert(text+'<br>'+url,{title:'Позови друзей'}); } } });
+}
+
 // ---------- a new enterprise is an event ----------
 function entCelebrate(e){
   const idx=ENT.indexOf(e), nx=nextEnt(ME), total=incomeOf(ME);
@@ -2312,7 +2530,7 @@ let tDeadline=0, tTick=null, pendingTimed=null;
 try{ const tl=localStorage.getItem('koop.tlimit'); if(tl!==null) $('tlimit').value=tl; }catch(e){}
 $('tlimit').addEventListener('change',e=>{ try{localStorage.setItem('koop.tlimit',e.target.value);}catch(x){} });
 function tLimit(){ return +$('tlimit').value||0; }
-function timerShouldRun(){ return G&&!G.tut&&!G.over&&pending&&!pending.p.isBot&&viewOpen&&!busy&&!paused&&$('curtain').hidden&&$('intro').hidden&&$('pview').hidden&&$('loading').hidden&&!tourOn&&!tourQueued&&tLimit()>0; }
+function timerShouldRun(){ return G&&!G.tut&&!G.over&&pending&&!pending.p.isBot&&!(G.online&&(pending.p.id!==meId||pending.p.remote&&NET.role==='host'))&&viewOpen&&!busy&&!paused&&$('curtain').hidden&&$('intro').hidden&&$('pview').hidden&&$('loading').hidden&&!tourOn&&!tourQueued&&tLimit()>0; }
 function startTimer(){ stopTimer(); if(!timerShouldRun()) return; tDeadline=Date.now()+tLimit()*1000; tTick=setInterval(tickTimer,250); tickTimer(); }
 function stopTimer(){ const tc=document.getElementById('tclock'); if(tc) tc.hidden=true; if(tTick){ clearInterval(tTick); tTick=null; } tDeadline=0; }
 let bannerT=null;
