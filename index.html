@@ -541,10 +541,60 @@ body:not(.dev) #autoplay{display:none}
 .tb-clock i{position:absolute;left:50%;top:50%;width:4px;height:40%;margin-left:-2px;background:var(--brass);border-radius:2px;transform-origin:50% 0;animation:tbspin 1s linear infinite}
 .tb-clock::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:28%;margin-left:-2px;background:#FFE2A8;border-radius:2px;transform-origin:50% 0;transform:rotate(200deg)}
 @keyframes tbspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.tclock{position:absolute;left:50%;top:2px;transform:translateX(-50%);z-index:31;display:flex;align-items:center;gap:6px;padding:3px 12px 3px 8px;border-radius:999px;background:rgba(26,3,5,.85);border:1px solid var(--brass);font-family:var(--display);font-size:16px;color:var(--brass);font-variant-numeric:tabular-nums;pointer-events:none}
+.tclock{position:absolute;right:0;bottom:8px;transform:none;z-index:31;display:flex;align-items:center;gap:6px;padding:3px 12px 3px 8px;border-radius:999px;background:rgba(26,3,5,.85);border:1px solid var(--brass);font-family:var(--display);font-size:16px;color:var(--brass);font-variant-numeric:tabular-nums;pointer-events:none}
 .tclock i{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;position:relative}
 .tclock i::after{content:"";position:absolute;left:4px;top:1px;width:2px;height:5px;background:currentColor}
 .tclock.hot{color:#FF6B5A;border-color:#FF6B5A;animation:pulse 1s infinite}
+/* ---------- page bar ---------- */
+.backbar{align-items:center;margin-bottom:8px}
+.backbtn{width:44px;height:40px;padding:0;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;border-radius:10px;flex:none}
+.bartitle{margin:0 auto 0 4px;font-size:22px}
+/* ---------- empire: board of photos, the next target, the ladder ---------- */
+.emp{display:flex;flex-direction:column;gap:12px}
+.emp-top{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.emp-board{position:relative;border-radius:12px;padding:12px 14px 16px;overflow:hidden;
+  background:radial-gradient(ellipse at 30% 20%,rgba(255,220,160,.10),transparent 60%),repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 2px,transparent 2px 7px),linear-gradient(160deg,#5A2E18,#3A1A0C);
+  box-shadow:inset 0 0 0 6px #2A1208,inset 0 0 40px rgba(0,0,0,.6),0 10px 26px rgba(0,0,0,.5)}
+.emp-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;color:#F3E6CC}
+.emp-head small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);width:100%}
+.emp-head b{font-family:var(--display);font-weight:400;font-size:30px;line-height:1}
+.emp-head b em{font-style:normal;font-size:15px;color:rgba(243,230,204,.6)}
+.emp-head span{font-size:13px}
+.pins{display:flex;flex-wrap:wrap;align-items:flex-start;padding:10px 6px 0 10px;min-height:110px}
+.pol{margin:0 0 6px -10px;width:clamp(84px,calc(var(--vh) * 26),130px);padding:6px 6px 0;background:#F4EEE2;border-radius:2px;transform:rotate(var(--r));box-shadow:0 6px 14px rgba(0,0,0,.55);position:relative;animation:polin .5s calc(var(--i) * .07s) both}
+.pol:first-child{margin-left:0}
+.pol img{display:block;width:100%;aspect-ratio:1;object-fit:cover;object-position:center 42%;border-radius:1px}
+.pol .pemoji{display:flex;width:100%;aspect-ratio:1;align-items:center;justify-content:center;font-size:clamp(34px,calc(var(--vh) * 11),56px);background:linear-gradient(160deg,#E5DCC9,#CFC3AB)}
+.pol figcaption{font-size:10px;line-height:1.2;color:#3A2A1C;text-align:center;padding:4px 2px 6px;font-weight:500;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.4em}
+.pol .pin{position:absolute;left:50%;top:-5px;width:11px;height:11px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FF7A6A,#A0140E 70%);box-shadow:0 2px 3px rgba(0,0,0,.6)}
+@keyframes polin{from{opacity:0;transform:translateY(-14px) rotate(calc(var(--r) * 2))}to{opacity:1;transform:rotate(var(--r))}}
+.emp-next{border-radius:12px;padding:12px 14px;background:linear-gradient(170deg,#3A080C,#1E0406);border:1px dashed rgba(217,168,104,.55);display:flex;flex-direction:column;gap:10px;justify-content:space-between}
+.emp-next.ready{border-style:solid;border-color:var(--brass);box-shadow:0 0 0 1px var(--brass),0 0 30px rgba(217,168,104,.25)}
+.nx-kick{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
+.nx-body{display:flex;gap:12px;align-items:center}
+.nx-pic{flex:none;width:clamp(64px,calc(var(--vh) * 22),110px);aspect-ratio:1;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#140203;box-shadow:inset 0 0 0 1px rgba(217,168,104,.3)}
+.nx-pic img{width:100%;height:100%;object-fit:cover;filter:grayscale(.85) brightness(.75)}
+.nx-pic span{font-size:clamp(34px,calc(var(--vh) * 11),54px);filter:grayscale(.6) brightness(.8)}
+.emp-next.ready .nx-pic img,.emp-next.ready .nx-pic span{filter:none}
+.nx-info{min-width:0;display:flex;flex-direction:column;gap:5px}
+.nx-info h3{margin:0;font-size:18px;line-height:1.1;color:#FFF}
+.nx-inc{font-size:13px;color:var(--brass);font-family:var(--display)}
+.nx-bar{height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.nx-bar i{display:block;height:100%;background:linear-gradient(90deg,#8A5A22,var(--brass))}
+.nx-cnt{font-size:12px;color:var(--paper-dim)}
+.emp-next .big{width:100%;font-size:14px;padding:10px}
+.emp-next .big:disabled{opacity:.7}
+.emp-road>small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:4px 0 8px}
+.road{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;counter-reset:r}
+.rung{display:grid;grid-template-columns:auto auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;padding:6px 10px;border-radius:8px;background:rgba(20,2,4,.72);border-left:3px solid rgba(217,168,104,.35);opacity:.78}
+.rung .rn{grid-row:1/3;font-family:var(--display);font-size:18px;color:rgba(217,168,104,.7);min-width:22px;text-align:center}
+.rung .ric{grid-row:1/3;font-size:22px;filter:grayscale(.7)}
+.rung b{font-weight:500;font-size:12px;line-height:1.15;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rung .rc{font-size:11px;color:var(--paper-dim)}
+@media (max-height:520px) and (orientation:landscape), (max-width:520px) and (orientation:portrait){
+  .emp-head b{font-size:24px}.pins{min-height:90px}.nx-info h3{font-size:16px}.bartitle{font-size:18px}.backbtn{width:40px;height:36px}
+}
+@media (max-width:620px) and (orientation:portrait){ html.norot .emp-top{grid-template-columns:1fr} }
 /* ---------- new enterprise event ---------- */
 .entcele{position:fixed;inset:0;z-index:135;display:flex;align-items:center;justify-content:center;padding:max(10px,var(--st)) max(16px,var(--sr)) max(10px,var(--sb)) max(16px,var(--sl));background:rgba(6,0,1,0);transition:background .6s}
 .entcele.on{background:radial-gradient(ellipse at 35% 50%,rgba(70,14,10,.96),rgba(6,0,1,.98) 70%)}
@@ -751,19 +801,16 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 
 <!-- ===================== PROFILE ===================== -->
 <div class="page" id="page-profile">
-  <div class="backbar"><button onclick="goPage('game')">← Назад</button></div>
+  <div class="backbar"><button class="backbtn" onclick="goPage('game')" aria-label="Назад">←</button></div>
   <div id="profbody"></div>
 </div>
 <div class="page" id="page-empire">
-  <div class="backbar"><button onclick="goPage('game')">← Назад</button><span class="bal" id="empbal"></span></div>
-  <h2>Империя</h2>
-  <p class="dim" style="font-size:13px;margin:4px 0 12px">Предприятия покупаются по очереди за ваучеры. Каждое приносит копейки после каждой партии.</p>
-  <div id="entlist" class="entlist"></div>
+  <div class="backbar"><button class="backbtn" onclick="goPage('game')" aria-label="Назад">←</button><h2 class="bartitle">Империя</h2><span class="bal" id="empbal"></span></div>
+  <div id="entlist" class="emp"></div>
 </div>
 <div class="page" id="page-shop">
-  <div class="backbar"><button onclick="goPage('game')">← Назад</button><span class="bal" id="shopbal"></span></div>
-  <h2>Лавка</h2>
-  <p class="dim" style="font-size:13px;margin:4px 0 12px">Вещи для хозяина кооператива. На игру не влияют, только на то, как тебя видят за столом.</p>
+  <div class="backbar"><button class="backbtn" onclick="goPage('game')" aria-label="Назад">←</button><h2 class="bartitle">Лавка</h2><span class="bal" id="shopbal"></span></div>
+  <p class="dim" style="font-size:13px;margin:2px 0 8px">Вещи для хозяина кооператива. На игру не влияют, только на то, как тебя видят за столом.</p>
   <div id="shoplist"></div>
 </div>
 <div id="reg" class="reg" hidden></div>
@@ -831,7 +878,7 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 
 <!-- ===================== RULES ===================== -->
 <div class="page" id="page-rules">
-  <div class="backbar"><button onclick="goPage('game')">← Назад</button></div>
+  <div class="backbar"><button class="backbtn" onclick="goPage('game')" aria-label="Назад">←</button></div>
   <div class="panel">
     <h2>Правила из коробки</h2>
     <p class="dim" style="font-size:12px">Если живых игроков не хватает, стол добирают соперники от игры.</p>
@@ -1822,15 +1869,35 @@ updateMeChip();
 
 // ---------- pages ----------
 function balHTML(){ return ME?`${VIC} ${fmt(ME.v)} ваучеров · ${KIC} ${fmt(ME.k)} копеек`:''; }
+const POL_ROT=[-6,4,-3,7,-5,3,-8,5,-2,6,-4,2];
+function polHTML(e,i,big){ const r=POL_ROT[i%POL_ROT.length]; return `<figure class="pol ${big?'big':''}" style="--r:${r}deg;--i:${i}">${e.img?`<img src="${e.img}" alt="">`:`<span class="pemoji">${e.ic}</span>`}<figcaption>${e.name}</figcaption><i class="pin"></i></figure>`; }
 function renderEmpire(){
-  if(!ME) return; $('empbal').textContent=balHTML(); const nx=nextEnt(ME);
-  $('entlist').innerHTML=ENT.map(e=>{ const own=ME.ent.includes(e.id), isNext=nx&&nx.id===e.id;
-    const right= own?'<span class="ok">✓ твоё</span>': isNext?`<button class="${ME.v>=e.cost?'primary':''}" data-buy="${e.id}" ${ME.v>=e.cost?'':'disabled'}>${VIC} ${fmt(e.cost)}</button>`:`<small>${VIC} ${fmt(e.cost)}</small>`;
-    return `<div class="ent ${own?'own':''} ${!own&&!isNext?'lock':''}"><span class="ic">${entIc(e)}</span><span><b>${e.name}</b><small>+${fmt(e.inc)} копеек за партию</small></span>${right}</div>`; }).join('');
+  if(!ME) return; $('empbal').innerHTML=balHTML(); const nx=nextEnt(ME);
+  const own=ENT.filter(e=>ME.ent.includes(e.id)), income=incomeOf(ME), nIdx=nx?ENT.indexOf(nx):ENT.length;
+  const can=nx&&ME.v>=nx.cost, pct=nx?Math.min(100,Math.round(ME.v/nx.cost*100)):100;
+  const road=ENT.slice(nIdx+1);
+  $('entlist').innerHTML=`
+    <div class="emp-top">
+      <section class="emp-board">
+        <div class="emp-head"><small>Кооператив «${esc(ME.coop)}»</small><b>${own.length} <em>из ${ENT.length}</em></b><span>${KIC} ${fmt(income)} копеек с каждой партии</span></div>
+        <div class="pins">${own.length?own.map((e,i)=>polHTML(e,i)).join(''):'<p class="dim">Пока пусто</p>'}</div>
+      </section>
+      ${nx?`<section class="emp-next ${can?'ready':''}">
+        <small class="nx-kick">Следующее · №${nIdx+1}</small>
+        <div class="nx-body">
+          <div class="nx-pic">${nx.img?`<img src="${nx.img}" alt="">`:`<span>${nx.ic}</span>`}</div>
+          <div class="nx-info"><h3>${nx.name}</h3><span class="nx-inc">+${fmt(nx.inc)} ${KIC} за партию</span>
+            <div class="nx-bar"><i style="width:${pct}%"></i></div>
+            <span class="nx-cnt">${VIC} ${fmt(ME.v)} / ${fmt(nx.cost)}</span></div>
+        </div>
+        <button class="${can?'primary':''} big" data-buy="${nx.id}" ${can?'':'disabled'}>${can?`Открыть за ${VIC} ${fmt(nx.cost)}`:`Не хватает ${VIC} ${fmt(nx.cost-ME.v)}`}</button>
+      </section>`:`<section class="emp-next ready"><small class="nx-kick">Империя собрана</small><h3>Все ${ENT.length} предприятий твои</h3></section>`}
+    </div>
+    ${road.length?`<section class="emp-road"><small>Дальше по лестнице</small><div class="road">${road.map((e,k)=>`<div class="rung"><span class="rn">${nIdx+2+k}</span><span class="ric">${e.ic}</span><b>${e.name}</b><span class="rc">${VIC} ${fmt(e.cost)} · +${fmt(e.inc)}</span></div>`).join('')}</div></section>`:''}`;
   $('entlist').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{ const e=ENT.find(x=>x.id===b.dataset.buy); if(!e||ME.v<e.cost) return; ME.v-=e.cost; ME.ent.push(e.id); saveMe(); updateMeChip(); renderEmpire(); entCelebrate(e); });
 }
 function renderShop(){
-  if(!ME) return; $('shopbal').textContent=balHTML();
+  if(!ME) return; $('shopbal').innerHTML=balHTML();
   $('shoplist').innerHTML=ITEMS.map(c=>`<div class="shopcat">${c.cat.toUpperCase()}</div><div class="shopgrid">${c.list.map(([id,name,ic,price])=>{ const own=ME.items.includes(id);
     return `<div class="item ${own?'own':''}"><span class="ic">${ic}</span><b>${name}</b>${own?'<small>✓ куплено</small>':`<small>${KIC} ${fmt(price)}</small><button class="${ME.k>=price?'primary':''}" data-item="${id}" ${ME.k>=price?'':'disabled'}>Купить</button>`}</div>`; }).join('')}</div>`).join('');
   $('shoplist').querySelectorAll('[data-item]').forEach(b=>b.onclick=()=>{ const it=ITEM_BY[b.dataset.item]; if(!it||ME.k<it.price) return; ME.k-=it.price; ME.items.push(it.id); saveMe(); updateMeChip(); renderShop(); });
