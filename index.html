@@ -876,6 +876,12 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 .coach .tip b{font-size:15px;margin-bottom:4px}
 .coach .tip p{font-size:13px;margin:0 0 8px;line-height:1.4}
 .coach .tip .hint{font-size:11px;color:var(--brass);letter-spacing:.06em}
+.coach .tip.wrong{border-color:#FF6B5A;box-shadow:0 0 0 1px rgba(255,107,90,.4),0 20px 50px rgba(0,0,0,.6);animation:qshake .35s}
+@keyframes qshake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.coach .qplate{margin:2px 0 8px;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,.35);border:1px solid rgba(217,168,104,.25)}
+.coach .qplate .plate{position:static;width:100%;transform:none;opacity:1}
+.coach .qbad{margin:0 0 8px;padding:7px 9px;border-radius:8px;background:rgba(255,107,90,.12);border:1px solid rgba(255,107,90,.45);font-size:12px;line-height:1.35}
+.coach .qbad b{display:inline;font-family:var(--body);font-size:12px;color:#FF9C8C;margin:0}
 .tutcard p{margin:0;font-size:15px;line-height:1.45}
 .wlist{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
 .wlist li{font-size:14px;line-height:1.4}
@@ -1847,7 +1853,7 @@ function kioskHTML(p,own,openCards,ctx){
 }
 function ownSpot(){
   let sp=$('ospot'); const resh=pending&&pending.type==='attack'&&sel.mode==='reshuffle';
-  const need=G&&!G.over&&!G.tut&&pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&(pending.type==='over'||pending.type==='give'||resh);
+  const need=G&&!G.over&&pending&&!pending.p.isBot&&pending.p.id===meId&&viewOpen&&!busy&&(pending.type==='over'||pending.type==='give'||(resh&&!G.tut));
   if(!need){ if(sp) sp.hidden=true; document.querySelectorAll('#mine .cpulse').forEach(x=>x.classList.remove('cpulse')); return; }
   if(!sp){ sp=document.createElement('div'); sp.id='ospot'; sp.className='ospot'; document.body.appendChild(sp); }
   const win=document.querySelector('#mine .window'); if(!win) return;
@@ -2245,16 +2251,16 @@ const TUT_STEPS=[
   {t:1,info:1,sel:'#mine .window',h:'Твоя точка',p:'Два щита и пустышка «Ушёл на базу». Щиты — твоя защита: потеряешь все — разорён. Держать можно не больше пяти.'},
   {t:1,sel:()=>`#mine .slotpos[data-i="${tutIdx(G.players[0],'license')}"]`,h:'Что в щите',p:'Нажми на «Легальную лицензию».',done:()=>!$('peek').hidden},
   {t:1,info:1,sel:'#peek .pk-plate',side:1,h:'Плашка щита',p:'Красные значки пробивают щит: Проверка и Связи. Золотой он отражает обратно: Деньги.',after:()=>hidePeek()},
-  {t:1,sel:()=>`#me [data-c="${tutHand('phone')}"]`,h:'Выбери карту',p:'Это твои атаки. Нажми на «Тётю Раю» — это Связи.',done:()=>sel.cards.length>0},
+  {t:1,quiz:{sid:'krysha',right:'phone'},h:'Чем бить?',p:'Мне шепнули: с краю у соперника «Крыша из города». Вот её плашка. Выбери в руке карту, которая её пробьёт.'},
   {t:1,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Бей соперника',p:'Его щиты закрыты. Нажми на любую его карту.',done:aimOpen},
-  {t:1,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'krysha')}"]`,h:'Куда бьём',p:'Шепнули: первая — «Крыша из города». Её пробивают Связи.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
+  {t:1,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'krysha')}"]`,h:'Куда бьём',p:'«Крыша» лежит первой. Нажми на неё.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
   {t:1,sel:'#aimfire',h:'Бей!',p:'Жми «Бить».',done:()=>G.players[0].attacksMade>=1},
-  {t:3,sel:()=>`#me [data-c="${tutHand('fist',0)}"]`,h:'Ставка',p:'Две карты одного вида — ставка на два щита. Выбери первую Братву…',done:()=>sel.cards.length>=1},
-  {t:3,sel:()=>`#me [data-c="${tutHand('fist',1)}"]`,h:'Ставка',p:'…и вторую.',done:()=>sel.cards.length>=2},
+  {t:3,quiz:{sid:'bratki',right:'fist'},h:'Твой ход',p:'Теперь у него на виду «Братки с района». Чем их пробить?'},
+  {t:3,sel:()=>`#me [data-c="${tutHand('fist',1)}"]`,h:'Ставка',p:'Верно. А теперь фокус: две карты одного вида бьют как одна, но забирают два щита. Добавь вторую Братву.',done:()=>sel.cards.length>=2},
   {t:3,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Бей соперника',p:'Нажми на его карту.',done:aimOpen},
   {t:3,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'bratki')}"]`,h:'Куда бьём',p:'Здесь «Братки с района», их пробивает Братва.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
   {t:3,sel:'#aimfire',h:'Бей!',p:'На кону два щита.',done:()=>G.players[0].attacksMade>=2},
-  {t:5,sel:()=>`#me [data-c="${tutHand('lens')}"]`,h:'Добей его',p:'Последний щит — «Администрация рынка», её пробивает Проверка. Выбери «Налоговую».',done:()=>sel.cards.length>0},
+  {t:5,quiz:{sid:'market',right:'lens'},h:'Добей его',p:'У него остались щит и пустышка. Щит — «Администрация рынка». Чем её взять?'},
   {t:5,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Бей соперника',p:'Нажми на его карту.',done:aimOpen},
   {t:5,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'market')}"]`,h:'Куда бьём',p:'Вот она.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
   {t:5,sel:'#aimfire',h:'Последний удар',p:'Жми «Бить».',done:()=>G.players[0].attacksMade>=3}
@@ -2270,12 +2276,32 @@ function placeTip(tip,r,side){
 }
 function coachStart(){ coach.on=true; coach.i=0; coach.info=null; clearInterval(coach.iv); coach.iv=setInterval(coachTick,200); }
 function coachStop(){ coachMark(null); coach.on=false; coach.info=null; coach.allow=null; clearInterval(coach.iv); $('coach').hidden=true; }
+function qSel(st){ if(st.quiz) return '#me .fan'; return typeof st.sel==='function'?st.sel():st.sel; }
+function qAllow(st){ if(!st.quiz) return st.allow||qSel(st); return (coach.tries||0)>=2?`#me [data-c="${tutHand(st.quiz.right)}"]`:'#me [data-c]'; }
+function qDone(st){ if(st.done) return st.done; if(!st.quiz) return null;
+  return ()=>{ const c=sel.cards.length?G.players[0].atk[sel.cards[0]]:null; return !!c&&c.type===st.quiz.right; }; }
+const TACC={mask:'Обаяние',money:'Деньги',fist:'Братву',phone:'Связи',lens:'Проверку',cap:'Погоны'};
+function quizWrong(sid,type){
+  const sh=SHIELDS[sid], T=TACC[type]||TYPES[type].name, nm=sh.name;
+  if(sh.refl.includes(type)) return `<b>Нет.</b> «${nm}» отражает ${T}: удар вернётся, и свой щит отдашь ты. Пробивают её: ${sh.vuln.map(v=>TYPES[v].name).join(' и ')}.`;
+  return `<b>Нет.</b> «${nm}» держит ${T} — удар пропадёт зря. Пробивают её: ${sh.vuln.map(v=>TYPES[v].name).join(' и ')}.`;
+}
+function coachQuiz(st){
+  if(!st||!st.quiz||!sel.cards.length) return false;
+  const card=G.players[0].atk[sel.cards[0]]; if(!card) return false;
+  if(card.type===st.quiz.right) return false;
+  coach.tries=(coach.tries||0)+1;
+  coach.flash={html:quizWrong(st.quiz.sid,card.type),until:Date.now()+3600};
+  sel.cards=[]; $('coach').dataset.key=''; render();
+  return true;
+}
 function coachTick(){
   if(!coach.on) return;
   if(coach.info){ coachDraw(); return; }
   let st=TUT_STEPS[coach.i];
-  while(st&&!st.info&&st.done&&st.done()){ coach.i++; st=TUT_STEPS[coach.i]; }
-  if(st&&myTurn(st.t)){ const selr=typeof st.sel==='function'?st.sel():st.sel; const needAim=selr.includes('.aim')||selr==='#aimfire'; if(needAim===aimOpen()){ coachDraw(st); return; } }
+  if(st&&st.quiz&&myTurn(st.t)) coachQuiz(st);
+  while(st&&!st.info&&qDone(st)&&qDone(st)()){ coach.i++; coach.tries=0; coach.flash=null; st=TUT_STEPS[coach.i]; }
+  if(st&&myTurn(st.t)){ const selr=qSel(st); const needAim=selr.includes('.aim')||selr==='#aimfire'; if(needAim===aimOpen()){ coachDraw(st); return; } }
   coach.allow=null; coachMark(null); $('coach').hidden=true;
 }
 function coachMark(allow){
@@ -2287,21 +2313,26 @@ function coachMark(allow){
 }
 function coachDraw(st){
   const s=coach.info||st; if(!s){ $('coach').hidden=true; return; }
-  const selr=typeof s.sel==='function'?s.sel():s.sel; const el=document.querySelector(selr);
+  const selr=coach.info?(typeof s.sel==='function'?s.sel():s.sel):qSel(s); const el=document.querySelector(selr);
   if(!el){ $('coach').hidden=true; return; }
-  const info=!!(coach.info||s.info); coach.allow=info?null:(s.allow||selr);
+  const info=!!(coach.info||s.info); coach.allow=info?null:(coach.info?(s.allow||selr):qAllow(s));
   const cardy=coachMark(coach.allow);
   let r=L(el.getBoundingClientRect()); const pad=6;
-  if(cardy&&s.allow){ const rs=[...document.querySelectorAll(s.allow)].map(x=>L(x.getBoundingClientRect())); if(rs.length){ const l=Math.min(...rs.map(q=>q.left)), t=Math.min(...rs.map(q=>q.top)), rr=Math.max(...rs.map(q=>q.right)), b=Math.max(...rs.map(q=>q.bottom)); r={left:l,top:t,right:rr,bottom:b,width:rr-l,height:b-t}; } }
+  const wide=coach.info?s.allow:(s.quiz?coach.allow:s.allow);
+  if(cardy&&wide){ const rs=[...document.querySelectorAll(wide)].map(x=>L(x.getBoundingClientRect())); if(rs.length){ const l=Math.min(...rs.map(q=>q.left)), t=Math.min(...rs.map(q=>q.top)), rr=Math.max(...rs.map(q=>q.right)), b=Math.max(...rs.map(q=>q.bottom)); r={left:l,top:t,right:rr,bottom:b,width:rr-l,height:b-t}; } }
   const tipW=Math.min(300,VW()-24);
   let left=r.left+r.width/2-tipW/2; left=Math.min(VW()-tipW-10,Math.max(10,left));
   let top=r.bottom+12; const tipH=info?150:110; if(top+tipH>VH()-6) top=Math.max(8,r.top-tipH-12);
   if(top<8||(top<r.bottom&&top+tipH>r.top)){ top=Math.max(8,Math.min(VH()-tipH-8,r.top)); left=r.right+14+tipW<VW()?r.right+14:Math.max(10,r.left-tipW-14); }
   const c=$('coach'); c.hidden=false; c.classList.toggle('act',!info&&!cardy); c.classList.toggle('cardy',!!cardy);
-  const key=selr+'|'+s.h+'|'+Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width);
+  const bad=!info&&s.quiz&&coach.flash&&Date.now()<coach.flash.until?coach.flash:null;
+  const key=selr+'|'+s.h+'|'+Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width)+'|'+(bad?bad.until:'')+'|'+(coach.tries||0);
   if(c.dataset.key===key) return; c.dataset.key=key;
+  const body=s.quiz
+    ? `<b>${s.h}</b><p>${s.p}</p><div class="qplate">${plateHTML(s.quiz.sid)}</div>${bad?`<div class="qbad">${bad.html}</div>`:''}<div class="hint">${bad?'Попробуй ещё':((coach.tries||0)>=2?'Подсвечена нужная карта':'👆 выбери карту в руке')}</div>`
+    : `<b>${s.h}</b><p>${s.p}</p>${info?'<div class="row" style="justify-content:flex-end"><button class="primary" id="coachnext">Понятно</button></div>':'<div class="hint">👆 нажми на подсвеченное</div>'}`;
   c.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>
-    <div class="tip" style="left:${left}px;top:${top}px;width:${tipW}px"><b>${s.h}</b><p>${s.p}</p>${info?'<div class="row" style="justify-content:flex-end"><button class="primary" id="coachnext">Понятно</button></div>':'<div class="hint">👆 нажми на подсвеченное</div>'}</div>`;
+    <div class="tip ${bad?'wrong':''}" style="left:${left}px;top:${top}px;width:${tipW}px">${body}</div>`;
   placeTip(c.querySelector('.tip'),r,s.side);
   const nb=$('coachnext'); if(nb) nb.onclick=()=>{ c.dataset.key=''; if(coach.info){ const d=coach.info.done; coach.info=null; $('coach').hidden=true; d&&d(); } else { s.after&&s.after(); coach.i++; coachTick(); } };
 }
