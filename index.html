@@ -643,14 +643,14 @@ button.primary small{opacity:.72}
 .slotpos.landing .cardbox{box-shadow:0 0 0 2px var(--brass),0 0 22px rgba(217,168,104,.6)}
 /* ---------- own-row spotlight (extra / give shield) ---------- */
 .slotpos.incoming{visibility:hidden}
-.ospot{position:fixed;inset:0;z-index:50;pointer-events:none}.ospot .tip,.ospot .mini{pointer-events:auto}
+.ospot{position:fixed;inset:0;z-index:50;pointer-events:none}.ospot .tip,.ospot .omini{pointer-events:auto}
 .ospot .spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(12,1,3,.72),0 0 0 2px var(--brass);transition:all .3s}
-.ospot .tip,.ospot .mini{position:fixed;max-width:300px;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:10px 14px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.ospot .tip,.ospot .omini{position:fixed;max-width:300px;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:10px 14px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
 .ospot .tip b{font-family:var(--display);font-weight:400;color:var(--brass);font-size:15px;display:block;margin-bottom:4px}
 .ospot .tip p{margin:0;font-size:13px;line-height:1.4}
-.ospot .mini.bare{background:none;border:none;box-shadow:none;padding:0}
-.ospot .sbtns{display:flex;gap:6px;margin-top:8px;pointer-events:auto}.ospot .mini .sbtns{margin:0}.ospot .sbtns button{padding:7px 14px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.6)}
-.ospot .mini{white-space:nowrap;padding:6px 12px;font-family:var(--display);font-size:13px;color:var(--brass)}
+.ospot .omini.bare{background:none;border:none;box-shadow:none;padding:0}
+.ospot .sbtns{display:flex;gap:6px;margin-top:8px;pointer-events:auto}.ospot .omini .sbtns{margin:0}.ospot .sbtns button{padding:7px 14px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.6)}
+.ospot .omini{white-space:nowrap;padding:6px 12px;font-family:var(--display);font-size:13px;color:var(--brass)}
 #mine{position:relative;z-index:51}
 /* ---------- tutorial pulse on the real targets ---------- */
 .cpulse{animation:cpulse2 1.05s ease-in-out infinite}
@@ -1865,8 +1865,8 @@ function ownSpot(){
   const rbtn=`<span class="sbtns"><button id="sp_shuf">Перемешать</button><button class="primary" id="sp_done">Готово</button></span>`;
   const txt=resh?`<b>Перекладываешь</b><p>Нажми на две свои карты — они поменяются местами. Или перемешай всё. Это вместо атаки.</p>${rbtn}`:pending.type==='over'?`<b>Лишний щит</b><p>Больше ${G.opts.v2limit} щитов держать нельзя. Нажми на щит, который уйдёт в сброс.</p>`:`<b>Отдай щит игроку ${esc(pending.to.name)}</b><p>Нажми на свой щит, который отдаёшь${pending.n>1?' (ещё '+pending.n+')':''}.</p>`;
   sp.hidden=false;
-  sp.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>${sp.dataset.first?`<div class="tip">${txt}</div>`:`<div class="mini ${resh?'bare':''}">${resh?rbtn:pending.type==='over'?'Лишний щит — в сброс':'Отдай щит'}</div>`}`;
-  const tip=sp.querySelector('.tip,.mini'); if(tip) placeTip(tip,r);
+  sp.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>${sp.dataset.first?`<div class="tip">${txt}</div>`:`<div class="omini ${resh?'bare':''}">${resh?rbtn:pending.type==='over'?'Лишний щит — в сброс':'Отдай щит'}</div>`}`;
+  const tip=sp.querySelector('.tip,.omini'); if(tip) placeTip(tip,r);
   const b1=$('sp_shuf'), b2=$('sp_done'); if(b1) b1.onclick=()=>{ const me=G.players[meId]; shuffle(me.table); sel.swapA=null; render(); }; if(b2) b2.onclick=()=>step({reshuffle:true});
   document.querySelectorAll('#mine .slotpos').forEach(x=>{ const i=+x.dataset.i; const me=G.players[meId]; if(me.table[i]&&(resh||me.table[i].kind==='shield')){ x.style.setProperty('--pc','#D9A868'); x.classList.add('cpulse'); } });
 }
@@ -2236,7 +2236,10 @@ function tutBot(req){
 }
 // info shown between moves; key = "turn:who:type" of the next request
 const TUT_GATES={
-  '2:1:attack':()=>({sel:'#mine .window',h:'Пробил!',p:`Щит соперника теперь твой. Он лёг в конец ряда под замком ${LOCK} — до твоего хода его не отбить.`}),
+  '2:1:attack':()=>[
+    {sel:'#mine .window',h:'Пробил!',p:`Щит соперника теперь твой: он лёг в конец твоего ряда. Один круг он под замком ${LOCK} — отбить его нельзя, пока ход не вернётся к тебе.`},
+    {sel:'#mine .window',h:'Ход Михалыча',p:'Теперь бьёт он. Твои щиты для него закрыты, так что он ткнёт наугад в одну из твоих карт. Следи за своим рядом.'}
+  ],
   '3:0:attack':()=>({sel:`#mine .slotpos[data-i="${tutIdx(G.players[0],'dummy')}"]`,h:'«Ушёл на базу»',p:'Соперник попал в пустышку. Промах, никто ничего не теряет.'}),
   '4:1:attack':()=>({sel:'#opps .kiosk',h:'Забрал два',p:'Ставка ×2 сработала. Но если бы щит отразил удар — ты отдал бы два своих.'}),
   '5:0:attack':()=>({sel:`#mine .slotpos[data-i="${tutIdx(G.players[0],'license')}"]`,h:'Щит держит',p:'Обаяния нет на плашке лицензии — удар просто держится, ничего не происходит.'})
@@ -2244,7 +2247,8 @@ const TUT_GATES={
 async function tutGate(req){
   if(!G||!G.tut) return; const key=`${G.turn}:${req.p.id}:${req.type}`; const g=TUT_GATES[key];
   if(!g||G.tutGates[key]) return; G.tutGates[key]=1; render(true);
-  await new Promise(res=>{ coach.info={...g(),done:res}; coachDraw(); });
+  for(const gi of [].concat(g())) await new Promise(res=>{ coach.info={...gi,done:res}; coachDraw(); });
+  if(req.p.isBot) await sleep(700);
 }
 // forced steps on your own turns
 function myTurn(t){ return G&&G.tut&&!G.over&&pending&&pending.p.id===0&&pending.type==='attack'&&!busy&&G.turn===t; }
@@ -2307,6 +2311,8 @@ function coachTick(){
   let st=TUT_STEPS[coach.i];
   if(st&&st.quiz&&myTurn(st.t)) coachQuiz(st);
   while(st&&!st.info&&qDone(st)&&qDone(st)()){ coach.i++; coach.tries=0; coach.flash=null; st=TUT_STEPS[coach.i]; }
+  // the hand was deselected after the quiz: return to the question instead of pointing at the opponent with nothing in hand
+  if(st&&st.allow==='#opps .slotpos'&&!sel.cards.length&&!aimOpen()){ while(coach.i>0&&!TUT_STEPS[coach.i].quiz) coach.i--; st=TUT_STEPS[coach.i]; }
   if(st&&myTurn(st.t)){ const selr=qSel(st); const needAim=selr.includes('.aim')||selr==='#aimfire'; if(needAim===aimOpen()){ coachDraw(st); return; } }
   coach.allow=null; coachMark(null); $('coach').hidden=true;
 }
@@ -2335,8 +2341,8 @@ function coachDraw(st){
   const key=selr+'|'+s.h+'|'+Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width)+'|'+(bad?bad.until:'')+'|'+(coach.tries||0);
   if(c.dataset.key===key) return; c.dataset.key=key;
   const body=s.quiz
-    ? `<b>${s.h}</b><p>${s.p}</p><div class="qplate">${plateHTML(s.quiz.sid)}</div>${bad?`<div class="qbad">${bad.html}</div>`:''}<div class="hint">${bad?'Попробуй ещё':((coach.tries||0)>=2?'Подсвечена нужная карта':'👆 выбери карту в руке')}</div>`
-    : `<b>${s.h}</b><p>${s.p}</p>${info?'<div class="row" style="justify-content:flex-end"><button class="primary" id="coachnext">Понятно</button></div>':'<div class="hint">👆 нажми на подсвеченное</div>'}`;
+    ? `<b>${s.h}</b><p>${s.p}</p><div class="qplate">${plateHTML(s.quiz.sid)}</div>${bad?`<div class="qbad">${bad.html}</div>`:''}<div class="hint">${bad?'Попробуй ещё':((coach.tries||0)>=2?'Подсвечена нужная карта':'Выбери карту в руке')}</div>`
+    : `<b>${s.h}</b><p>${s.p}</p>${info?'<div class="row" style="justify-content:flex-end"><button class="primary" id="coachnext">Понятно</button></div>':'<div class="hint">Нажми на подсвеченное</div>'}`;
   c.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div>
     <div class="tip ${bad?'wrong':''}" style="left:${left}px;top:${top}px;width:${tipW}px">${body}</div>`;
   placeTip(c.querySelector('.tip'),r,s.side);
@@ -2389,7 +2395,7 @@ function postTutTick(){
   let left=Math.min(VW()-tipW-10,Math.max(10,r.left+r.width/2-tipW/2)); let top=r.bottom+12; if(top+120>VH()) top=Math.max(8,r.top-132);
   const c=$('coach'); c.hidden=false; c.classList.add('act'); c.classList.remove('cardy');
   const key=st.sel+Math.round(r.left)+','+Math.round(r.top); if(c.dataset.key===key) return; c.dataset.key=key;
-  c.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div><div class="tip" style="left:${left}px;top:${top}px;width:${tipW}px"><b>${st.h}</b><p>${st.p}</p><div class="hint">👆 нажми на подсвеченное</div></div>`;
+  c.innerHTML=`<div class="spot" style="left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px"></div><div class="tip" style="left:${left}px;top:${top}px;width:${tipW}px"><b>${st.h}</b><p>${st.p}</p><div class="hint">Нажми на подсвеченное</div></div>`;
   placeTip(c.querySelector('.tip'),r);
 }
 function tutResume(){ if(!ME||ME.tut===undefined||ME.tut===true) return false; if(ME.tut==='reward'){ postTutStart(); return true; } tutIntro(); return true; }
