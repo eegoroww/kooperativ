@@ -910,9 +910,10 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 .aimcard .slot-num{font-size:14px;left:8%;top:5%}
 .aimfoot{font-family:var(--display);color:var(--brass);font-size:15px}
 /* ---------- tour ---------- */
+#safeprobe{position:fixed;left:-9999px;top:0;width:1px;height:1px;padding:var(--st) var(--sr) var(--sb) var(--sl);pointer-events:none;visibility:hidden}
 .tour{position:fixed;inset:0;z-index:75;pointer-events:none}
 .tour .spot{position:fixed;border-radius:10px;box-shadow:0 0 0 9999px rgba(20,2,4,.78),0 0 0 2px var(--brass);transition:all .35s ease;pointer-events:none}
-.tour .tip{position:fixed;max-width:340px;background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:14px 16px;pointer-events:auto;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.tour .tip{position:fixed;max-width:min(340px,calc(var(--vw) * 100 - var(--sl) - var(--sr) - 20px));background:var(--panel);border:1px solid var(--brass);border-radius:10px;padding:14px 16px;pointer-events:auto;box-shadow:0 20px 50px rgba(0,0,0,.6)}
 .tour .tip b{font-family:var(--display);font-weight:400;color:var(--brass);font-size:16px;display:block;margin-bottom:6px}
 .tour .tip p{margin:0 0 12px;font-size:14px;font-weight:300;line-height:1.45}
 .tour .tip .row{justify-content:space-between}
@@ -1013,6 +1014,7 @@ input.vkfocus{background:rgba(217,168,104,.16)!important;animation:vkcaret 1s st
 <div id="pview" class="pview" hidden></div>
 <div id="intro" class="intro" hidden></div>
 <div id="tour" class="tour" hidden></div>
+<div id="safeprobe" aria-hidden="true"></div>
 <div id="coach" class="tour coach" hidden></div>
 <div id="peek" class="peek" hidden></div>
 
@@ -1648,7 +1650,7 @@ function startMatch(seats,quick,mo){
   if(mo&&mo.online) G.online=true;
   const first=(mo&&mo.first)||0; resetSel(); pending=null; gen=startGame(G,first);
   meId=(G.players.find(p=>!p.isBot&&!p.remote)||G.players[0]).id; lastHuman=null; sameTurnHuman=false; viewOpen=false;
-  $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
+  goPage('game'); $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
   say(G,'o-sys',`Раздача. Первым ходит ${seats[first].name}.`);
   step(undefined);
 }
@@ -2217,7 +2219,7 @@ function startTutorial(seats,repeat){
   // draws, popped from the end: me T1, op T1, me T2, op T2, me T3
   G.deck.push(tutCard('cap','cap-oper'),tutCard('cap','cap-gorbunov'),tutCard('lens','lens-tax'),tutCard('money','money-manager'),tutCard('fist','fist-patsany'));
   gen=startGame(G,0); meId=0; lastHuman=null; sameTurnHuman=false; viewOpen=false;
-  $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
+  goPage('game'); $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame');
   say(G,'o-sys','Обучающая партия. Первым ходишь ты.');
   step(undefined); coachStart();
 }
@@ -2266,12 +2268,16 @@ const TUT_STEPS=[
   {t:5,sel:'#aimfire',h:'Последний удар',p:'Жми «Бить».',done:()=>G.players[0].attacksMade>=3}
 ];
 const coach={on:false,i:0,info:null,iv:null,allow:null};
+// safe-area insets, already remapped for rotated mode by the CSS vars
+function SAFE(){ const p=$('safeprobe'); if(!p) return {t:0,r:0,b:0,l:0}; const c=getComputedStyle(p);
+  return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}; }
 function placeTip(tip,r,side){
-  const W=VW(), H=VH(), w=tip.offsetWidth, h=tip.offsetHeight, g=12, m=8;
-  const cx=Math.min(W-w-m,Math.max(m,r.left+r.width/2-w/2)), cy=Math.min(H-h-m,Math.max(m,r.top+r.height/2-h/2));
+  const W=VW(), H=VH(), w=tip.offsetWidth, h=tip.offsetHeight, g=12, S=SAFE(), m=8;
+  const mL=Math.max(m,S.l), mR=Math.max(m,S.r), mT=Math.max(m,S.t), mB=Math.max(m,S.b);
+  const cx=Math.min(W-w-mR,Math.max(mL,r.left+r.width/2-w/2)), cy=Math.min(H-h-mB,Math.max(mT,r.top+r.height/2-h/2));
   let c=[[cx,r.bottom+g],[cx,r.top-h-g],[r.right+g,cy],[r.left-w-g,cy]]; if(side) c=[c[2],c[3],c[0],c[1]];
-  const ok=([x,y])=>x>=m&&y>=m&&x+w<=W-m&&y+h<=H-m&&!(x<r.right&&x+w>r.left&&y<r.bottom&&y+h>r.top);
-  const best=c.find(ok)||c.map(([x,y])=>[Math.min(W-w-m,Math.max(m,x)),Math.min(H-h-m,Math.max(m,y))]).find(ok)||[m,m];
+  const ok=([x,y])=>x>=mL&&y>=mT&&x+w<=W-mR&&y+h<=H-mB&&!(x<r.right&&x+w>r.left&&y<r.bottom&&y+h>r.top);
+  const best=c.find(ok)||c.map(([x,y])=>[Math.min(W-w-mR,Math.max(mL,x)),Math.min(H-h-mB,Math.max(mT,y))]).find(ok)||[mL,mT];
   tip.style.left=best[0]+'px'; tip.style.top=best[1]+'px';
 }
 function coachStart(){ coach.on=true; coach.i=0; coach.info=null; clearInterval(coach.iv); coach.iv=setInterval(coachTick,200); }
@@ -2648,7 +2654,7 @@ async function netClientData(m){
   if(m.t==='st'||m.t==='ev'){
     const first=!G||!G.online||$('boardwrap').hidden;
     G=m.G; G.online=true; G.events=[];
-    if(first){ meId=NET.seat!=null?NET.seat:meId; gen=null; lastHuman=null; viewOpen=true; resetSel(); $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame'); }
+    if(first){ meId=NET.seat!=null?NET.seat:meId; gen=null; lastHuman=null; viewOpen=true; resetSel(); goPage('game'); $('setup').hidden=true; $('boardwrap').hidden=false; document.body.classList.add('ingame'); }
     viewOpen=true;
     if(m.t==='ev'){ if(pending) pending=netUnpend(netPend(pending)); busy=true; G.events=m.evs; await playEvents(); await sleep(P().after); busy=false; render(); return; }
     const np=netUnpend(m.pend); const seq=m.pend?m.pend.seq:-1;
