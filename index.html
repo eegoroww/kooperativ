@@ -2190,6 +2190,8 @@ const TUT_OPP='Михалыч';
 function tutCard(type,img){ const a=ATTACKS.find(x=>x[2]===img); return {type,name:a[1],img}; }
 function tutIdx(p,sid){ return p.table.findIndex(s=>s&&(sid==='dummy'?s.kind==='dummy':s.sid===sid)); }
 function tutHand(type,nth){ const me=G.players[0]; let k=0; for(let i=0;i<me.atk.length;i++){ if(me.atk[i].type===type){ if(k===(nth||0)) return i; k++; } } return -1; }
+// a card of that type that is not selected yet — whichever twin the player picked first
+function tutHandFree(type){ const me=G.players[0]; for(let i=0;i<me.atk.length;i++){ if(me.atk[i].type===type&&!sel.cards.includes(i)) return i; } return -1; }
 function showWelcome(){
   const r=$('reg'); r.hidden=false;
   r.innerHTML=`<div class="regcard tutcard"><span class="stamp">1993</span><h2>Кооператив «${esc(ME.coop)}»</h2>
@@ -2262,7 +2264,7 @@ const TUT_STEPS=[
   {t:1,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'krysha')}"]`,h:'Куда бьём',p:'«Крыша» лежит первой. Нажми на неё.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
   {t:1,sel:'#aimfire',h:'Бей!',p:'Жми «Бить».',done:()=>G.players[0].attacksMade>=1},
   {t:3,quiz:{sid:'bratki',right:'fist'},h:'Твой ход',p:'Теперь у него на виду «Братки с района». Чем их пробить?'},
-  {t:3,sel:()=>`#me [data-c="${tutHand('fist',1)}"]`,h:'Ставка',p:'Верно. А теперь фокус: две карты одного вида бьют как одна, но забирают два щита. Добавь вторую Братву.',done:()=>sel.cards.length>=2},
+  {t:3,sel:()=>`#me [data-c="${tutHandFree('fist')}"]`,h:'Ставка',p:'Верно. А теперь фокус: две карты одного вида бьют как одна, но забирают два щита. Добавь вторую Братву.',done:()=>sel.cards.length>=2},
   {t:3,sel:'#opps .kiosk .window',allow:'#opps .slotpos',h:'Бей соперника',p:'Нажми на его карту.',done:aimOpen},
   {t:3,sel:()=>`.aim .aimcard[data-i="${tutIdx(G.players[1],'bratki')}"]`,h:'Куда бьём',p:'Здесь «Братки с района», их пробивает Братва.',done:()=>!!document.querySelector('.aim .aimcard.sel')},
   {t:3,sel:'#aimfire',h:'Бей!',p:'На кону два щита.',done:()=>G.players[0].attacksMade>=2},
